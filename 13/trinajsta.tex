@@ -1,0 +1,373 @@
+\documentclass{article}
+
+\usepackage[utf8]{inputenc}
+\usepackage{amsmath}
+\usepackage{mathtools}
+\usepackage{graphicx}
+\usepackage{subcaption}
+\usepackage{caption}
+\usepackage{float}
+\usepackage{geometry}
+\usepackage{physics}
+\usepackage{mathrsfs}
+\usepackage[slovene]{babel}
+\geometry{margin=1in}
+
+\title{Metoda maksimalne entropije in linearna napoved}
+\author{Andrej Kolar-Požun, 28172042}
+
+
+
+\errorcontextlines 10000
+\begin{document}
+\pagenumbering{gobble}
+\maketitle
+\newpage
+\pagenumbering{arabic}
+\section{Spekter signalov}
+
+Spektre signalov bom v tej nalogi določil še na drugi način - z metodo maksimalne entropije(MEM).
+
+Za to metodo  bom potreboval avtokorelacijske funkcije signala definirane kot
+\begin{equation*}
+R(i) = \frac{1}{N-i} \sum_{n=0}^{N-1-i} s_{n} s_{n+i}
+\end{equation*}
+
+Tekom metode skušamo minimizirati
+\begin{equation*}
+min = E[s_n^2] + \sum_{k=1}^p a_k E[S_n S_{n-k}] 
+\end{equation*}
+s pomočjo česa bomo določili red metode p.
+Koeficiente $a_k$ določimo z reševanjem Toeplitzovega sistema:
+\begin{equation*}
+\begin{bmatrix} 
+R(0) & R(1) &  \cdots & R(p-1) \\ 
+R(1) & R(2) & \cdots & R(p-2) \\
+\vdots & \vdots &  \ddots & \vdots \\
+R(p-1) & R(p-2) & \cdots & R(0) \end{bmatrix}  \begin{bmatrix}a_1 \\ a_2 \\ \vdots \\ a_p\end{bmatrix} = -\begin{bmatrix}R(1) \\ R(2) \\ \vdots \\ R(p)\end{bmatrix} 
+\end{equation*}
+
+Gostota močnostnega spektra je potem 
+\begin{equation*}
+P(\omega) = \frac{1}{|1+ \sum_{k=1}^p a_k e^{-i \omega k}|^2}
+\end{equation*}
+
+Uporabimo metodo najprej kar na najenostavnejšem izmed naših signalov: signal val3.dat
+
+\begin{figure}[H]
+\centering
+\begin{subfigure}{.49\textwidth}
+\includegraphics[width=\linewidth]{prva/val3vecp.pdf}
+\end{subfigure}
+\begin{subfigure}{.49\textwidth}
+\includegraphics[width=\linewidth]{prva/val3vecp2.pdf}
+\end{subfigure}
+\caption*{Črtkan graf označuje spekter pridobljen s FFT in Hannovim oknom. Vidimo, da za majhne p 3 in 5 je polov premalo, da bi sploh našli vrhove. Pri p=7 enega še vedno čisto zgrešimo,p=10 pa je že v redu. Vrhovi so ožji kot pri FFT a metoda manj potlači frekvence izven vrhov. Če p še povečujemo, dobimo izven glavnih  vrhov še manjše, zavajujoče vrhke.}
+\end{figure}
+
+\begin{figure}[H]
+\centering
+\begin{subfigure}{.49\textwidth}
+\includegraphics[width=\linewidth]{prva/val2vecp.pdf}
+\end{subfigure}
+\begin{subfigure}{.49\textwidth}
+\includegraphics[width=\linewidth]{prva/val2vecp2.pdf}
+\end{subfigure}
+\caption*{Pri spektru val2 je razlika večja. Že p=7, zadane oba glavna vrhova, zunaj vrhov pa metoda nima toliko oscilacij kot FFT. Z večanjem p je zgodba ista kot prej}
+\end{figure}
+
+\begin{figure}[H]
+\centering
+\begin{subfigure}{.49\textwidth}
+\includegraphics[width=\linewidth]{prva/val3vecN.pdf}
+\end{subfigure}
+\begin{subfigure}{.49\textwidth}
+\includegraphics[width=\linewidth]{prva/val2vecN.pdf}
+\end{subfigure}
+\caption*{Glede na to, da je pri metodi MEM spekter zvezna funkcija frekvence, lahko pogledamo še kako je rezultat odvisen od gostote prikaza. Metoda dobro deluje tudi pri majnših N, le da je seveda pri npr N=50 premalo točk, da bi točno zadeli vrh in ga za malo zgrešimo.}
+\end{figure}
+
+Zdaj gremo na obdelavo novih podatkov in sicer koncentracije $CO_2$ v zraku v odvisnosti od leta:
+
+\begin{figure}[H]
+\centering
+\begin{subfigure}{.49\textwidth}
+\includegraphics[width=\linewidth]{prva/co2.pdf}
+\end{subfigure}
+\begin{subfigure}{.49\textwidth}
+\includegraphics[width=\linewidth]{prva/co2fit.pdf}
+\end{subfigure}
+\caption*{Vidimo, da ima odvisnost nek linearen trend. Ker nas zanimajo le frekvence, nas bo ta trend samo motil in sem ga na desnem grafu odštel.}
+\end{figure}
+
+\begin{figure}[H]
+\centering
+\begin{subfigure}{.49\textwidth}
+\includegraphics[width=\linewidth]{prva/co2vecp.pdf}
+\end{subfigure}
+\begin{subfigure}{.49\textwidth}
+\includegraphics[width=\linewidth]{prva/co2vecN.pdf}
+\end{subfigure}
+\caption*{Vidimo, da ima odvisnost nek linearen trend. Ker nas zanimajo le frekvence, nas bo ta trend samo motil in sem ga na desnem grafu odštel.}
+\end{figure}
+
+Zanimivo bi bilo pogledati, kje točno se nahajajo poli spektra. Zanimajo nas torej rešitve enačbe
+\begin{align*}
+&1 + \sum_{k=1}^p a_k z^{-k} = 0 \\
+&z^p + \sum_{k=1}^p a_k z^{p-k} = 0
+\end{align*}
+
+\begin{figure}[H]
+\centering
+\begin{subfigure}{.7\textwidth}
+\includegraphics[width=\linewidth]{prva/poli.pdf}
+\end{subfigure}
+\caption*{Vidimo, da večanje p-ja potiska pole spektra proti enotskem krogu. Hkrati sem z rdečo narisal še točke na enotskem krogu, ki ustrezajo frekvencam treh izrazitih vrhov na zgornjem spektru. Vidimo, da te točke sovpadajo z enotskim krogom najbližjimi poli za p=15(pri p=15 pa vrhe že dobro zadanemo).}
+\end{figure}
+
+
+Pogledal bom še ločljivost metode, torej kako blizu sta lahko vsebovani frekvenci, da se razločim vrhova?
+
+\begin{figure}[H]
+\centering
+\begin{subfigure}{.49\textwidth}
+\includegraphics[width=\linewidth]{prva/locljivost1.pdf}
+\end{subfigure}
+\begin{subfigure}{.49\textwidth}
+\includegraphics[width=\linewidth]{prva/locljivost2.pdf}
+\end{subfigure}
+\caption*{Locljivost metode FFt je priblizno 0.2 Uporabljeno je bilo Hannovo okno, ki morda vpliva na ločljivost, a je verjetno okno, ki bi ga v praksi najpogosteje uporabil.}
+\end{figure}
+
+
+\begin{figure}[H]
+\centering
+\begin{subfigure}{.49\textwidth}
+\includegraphics[width=\linewidth]{prva/locljivost3.pdf}
+\end{subfigure}
+\begin{subfigure}{.49\textwidth}
+\includegraphics[width=\linewidth]{prva/locljivost5.pdf}
+\end{subfigure}
+\caption*{Locljivost MEM metode je mocno odvisna od parametra p. Pri p=20 že dosežemo ločljivost 0.1, a moramo za to plačati v dodatnih nižjih vrhovih.}
+\end{figure}
+
+\section{Linearna napoved}
+
+Prej izračunane koeficiente $a_i$ lahko uporabljamo tudi za linearno napoved signala na naslednji način:
+\begin{equation*}
+s_n \approx - \sum_{k=1}^p a_k s_{n-k}
+\end{equation*}
+
+Zgornjo formulo lahko uporabljamo rekurzivno naprej in določimo signal poljubno daleč v prihodnost. Pravilnost je v daljni prihodnosti seveda vprašljiva.
+Preizkusimo metodo na datoteki val3.dat:
+
+\begin{figure}[H]
+\centering
+\begin{subfigure}{.49\textwidth}
+\includegraphics[width=\linewidth]{druga/val31.pdf}
+\end{subfigure}
+\begin{subfigure}{.49\textwidth}
+\includegraphics[width=\linewidth]{druga/val32brez.pdf}
+\end{subfigure}
+\caption*{Na levi je napoved za p=5, za katero vidimo, da zelo slabo deluje. Signal praktično takoj zamre. Poli so v tem primeru bili vsi znotraj enotskega kroga. Na desni imamo primer p=10, kjer napoven signal zelo naraste.}
+\end{figure}
+
+\begin{figure}[H]
+\centering
+\begin{subfigure}{.49\textwidth}
+\includegraphics[width=\linewidth]{druga/val32poli.pdf}
+\end{subfigure}
+\begin{subfigure}{.49\textwidth}
+\includegraphics[width=\linewidth]{druga/val32.pdf}
+\end{subfigure}
+\caption*{Zdaj vidimo razlog za naraščanje. Eden izmed polov je bil zunaj enotskega kroga. Pol sem preslikal na enotski krog in iz novih ničel ponovno dobil koeficiente $a_i$ rezultat je viden na desni. Napoved zgleda že malo boljša a vseeno ni čisto prava. Izgleda kot, da smo poskusili kopirati levo polovico, v resnici pa se je signal malo spremenil.}
+\end{figure}
+
+\begin{figure}[H]
+\centering
+\begin{subfigure}{.49\textwidth}
+\includegraphics[width=\linewidth]{druga/val33poli.pdf}
+\end{subfigure}
+\begin{subfigure}{.49\textwidth}
+\includegraphics[width=\linewidth]{druga/val33.pdf}
+\end{subfigure}
+\caption*{Za p=20 je polov zunaj enotskega kroga nekaj več. Po preslikanju le-teh na krožnico, dobim podobno situacijo kot pri p=10.}
+\end{figure}
+
+\begin{figure}[H]
+\centering
+\begin{subfigure}{.75\textwidth}
+\includegraphics[width=\linewidth]{druga/odstopanja.pdf}
+\end{subfigure}
+\caption*{Tukaj vidimo, da se odstopanje po p=10 bistveno ne zmanjšuje. Odstopanje sem tukaj definiral kot vsoto absolutnih vrednosti razlik med napovedjo in pravim signalom po vseh točkah. Za nekakšno povprečno odstopanje na bi moral zgornjo količino deliti še z 256(dolžino polovice signala), kar bi v najboljšem primeru prišlo okoli 0.5, kar je glede na to, da se signal gibljje med -6 in 6 kar dobro za tako preprosto metodo.}
+\end{figure}
+
+\begin{figure}[H]
+\centering
+\begin{subfigure}{.49\textwidth}
+\includegraphics[width=\linewidth]{druga/odstopanjaval2.pdf}
+\end{subfigure}
+\begin{subfigure}{.49\textwidth}
+\includegraphics[width=\linewidth]{druga/odstopanjaval2spet.pdf}
+\end{subfigure}
+\caption*{Tokrat sem rezultat delil s številom točk 256, da se ne bomo zmedli, ko bomo mogoče pri naslednjih primerih gledali grafe z drugačnim številom točk. Na levi je nekje vmes prišlo čudno veliko odstopanje, zato sem na desni spet narisal le do p=20, kjer vidimo, da se odstopanje ustali nekje pri p=18.}
+\end{figure}
+
+\begin{figure}[H]
+\centering
+\begin{subfigure}{.75\textwidth}
+\includegraphics[width=\linewidth]{druga/val2.pdf}
+\end{subfigure}
+\caption*{val2, ne da kaj lepše slike od val3.}
+\end{figure}
+
+\begin{figure}[H]
+\centering
+\begin{subfigure}{.49\textwidth}
+\includegraphics[width=\linewidth]{druga/odstopanjaco2.pdf}
+\end{subfigure}
+\begin{subfigure}{.49\textwidth}
+\includegraphics[width=\linewidth]{druga/co2.pdf}
+\end{subfigure}
+\caption*{Odstopanje se tukaj malo pozneje stabilizira, pri približno p=25. Vidimo, da je približno 1.2, kar je slabše kot prej, ker gre signal še vedno nekje med -6 in 6. Na desni se še lepše vidi, da napoved hitro čisto fali. Smo pa zelo dobro zadeli frekvenco}
+\end{figure}
+
+
+\begin{figure}[H]
+\centering
+\begin{subfigure}{.75\textwidth}
+\includegraphics[width=\linewidth]{druga/borzaraw.pdf}
+\end{subfigure}
+\caption*{Signal izgleda zelo nepravilen}
+\end{figure}
+
+
+\begin{figure}[H]
+\centering
+\begin{subfigure}{.49\textwidth}
+\includegraphics[width=\linewidth]{druga/odstopanjaborza.pdf}
+\end{subfigure}
+\begin{subfigure}{.49\textwidth}
+\includegraphics[width=\linewidth]{druga/borza.pdf}
+\end{subfigure}
+\caption*{Linearna napoved tukaj gotovo ne deluje.}
+\end{figure}
+
+\begin{figure}[H]
+\centering
+\begin{subfigure}{.75\textwidth}
+\includegraphics[width=\linewidth]{druga/lunaraw.pdf}
+\end{subfigure}
+\caption*{Še podatki o lunarnih efemeridah}
+\end{figure}
+
+\begin{figure}[H]
+\centering
+\begin{subfigure}{.49\textwidth}
+\includegraphics[width=\linewidth]{druga/odstopanjaluna.pdf}
+\end{subfigure}
+\begin{subfigure}{.49\textwidth}
+\includegraphics[width=\linewidth]{druga/luna.pdf}
+\end{subfigure}
+\caption*{Slabo zadanemo amplitudo, frekvenca pa je ok.}
+\end{figure}
+
+\begin{figure}[H]
+\centering
+\begin{subfigure}{.75\textwidth}
+\includegraphics[width=\linewidth]{druga/lunaraw2.pdf}
+\end{subfigure}
+\caption*{Še več podatkov o lunarnih efemeridah}
+\end{figure}
+
+\begin{figure}[H]
+\centering
+\begin{subfigure}{.49\textwidth}
+\includegraphics[width=\linewidth]{druga/odstopanjaluna2.pdf}
+\end{subfigure}
+\begin{subfigure}{.49\textwidth}
+\includegraphics[width=\linewidth]{druga/luna2.pdf}
+\end{subfigure}
+\caption*{Podobno kot prejšnja napoved za luno.}
+\end{figure}
+
+\begin{figure}[H]
+\centering
+\begin{subfigure}{.75\textwidth}
+\includegraphics[width=\linewidth]{druga/soncniraw.pdf}
+\end{subfigure}
+\caption*{}
+\end{figure}
+
+\begin{figure}[H]
+\centering
+\begin{subfigure}{.49\textwidth}
+\includegraphics[width=\linewidth]{druga/odstopanjasoncni.pdf}
+\end{subfigure}
+\begin{subfigure}{.49\textwidth}
+\includegraphics[width=\linewidth]{druga/soncni.pdf}
+\end{subfigure}
+\caption*{Huda napaka.}
+\end{figure}
+
+
+\subsection{Vpliv šuma}
+Zanimivo bi bilo pogledati, kako se metoda obnese, če signal malo zašumimo. Testiral bom na signalu v val3, pri katerem je bilo odstopanje najmanjše (glej zgoraj) in pri katerem je metoda nekako najbolje delovala. Šum bom simuliral tako, da bom vsaki točki prištel Gaussovsko porazdeljeno število z povprečjem $\mu$(kot nekakšno ozadje) in deviacijo $\sigma$(recimo fluktuacije). Poglejmo kaj se zgodi:
+
+\begin{figure}[H]
+\centering
+\begin{subfigure}{.75\textwidth}
+\includegraphics[width=\linewidth]{druga/sumi.pdf}
+\end{subfigure}
+\caption*{Z $\sigma=0$ sem v zgornjem grafu označil nezašumljen signal. Odstopanje je bilo odvisno od vsakega poskusa, tako, da sem zgornje podatke za vsako sigmo povprečil čez 100 signal, zašumljenih po enakem sistemu. Za majhne p šum ne pokvari odstopanja, a je tam odstopanje že tako veliko. Pri večjem p, majhna deviacija šuma okoli povprečja 1 malce poveča odstopanje, le pri p=15 je to občutno večje. Za večje fluktuacije šuma ni kakega reda, imamo veliko ostrih vrhov in povečevanje fluktuacij šuma ne povečuje nujno odstopanja ampak izgleda zveza bolj komplicirana.}
+\end{figure}
+
+\begin{figure}[H]
+\centering
+\begin{subfigure}{.75\textwidth}
+\includegraphics[width=\linewidth]{druga/sumi2.pdf}
+\end{subfigure}
+\caption*{Tukaj je šum fluktuacija okoli ničle. Z sigma 0 sem spet označil nezašumljen signal. V tem primeru se zelo majhen šum s sigmo 0.01 zelo dobro pokriva z nezašumljenim signalom, torej napoved še vedno dobro deluje. Pri sigmi 0.05 imamo že večje odstopanje, a še vedno majhno. Pri večjih sigmah pa napoved ne deluje več tako dobro.}
+\end{figure}
+
+\begin{figure}[H]
+\centering
+\begin{subfigure}{.49\textwidth}
+\includegraphics[width=\linewidth]{druga/sumi3.pdf}
+\end{subfigure}
+\begin{subfigure}{.49\textwidth}
+\includegraphics[width=\linewidth]{druga/sumi4.pdf}
+\end{subfigure}
+\caption*{Tukaj so frekvence še v redu.}
+\end{figure}
+
+\begin{figure}[H]
+\centering
+\begin{subfigure}{.49\textwidth}
+\includegraphics[width=\linewidth]{druga/sumi5.pdf}
+\end{subfigure}
+\begin{subfigure}{.49\textwidth}
+\includegraphics[width=\linewidth]{druga/sumi6.pdf}
+\end{subfigure}
+\caption*{Tukaj so tudi še kar v redu, čeprav pri sigma=1 že malo zamaknjene}
+\end{figure}
+
+\begin{figure}[H]
+\centering
+\begin{subfigure}{.49\textwidth}
+\includegraphics[width=\linewidth]{druga/sumi7.pdf}
+\end{subfigure}
+\begin{subfigure}{.49\textwidth}
+\includegraphics[width=\linewidth]{druga/sumi8.pdf}
+\end{subfigure}
+\caption*{Pri mu=1 podobno. Sigma = 1 že zamakne frekvence}
+\end{figure}
+
+\begin{figure}[H]
+\centering
+\begin{subfigure}{.7\textwidth}
+\includegraphics[width=\linewidth]{druga/sumi9.pdf}
+\end{subfigure}
+\caption*{Tudi zelo premaknjen šum(mu=5) ne pokvari frekvenc, če je sigma še majhna.}
+\end{figure}
+\end{document}

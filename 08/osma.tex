@@ -1,0 +1,383 @@
+\documentclass{article}
+
+\usepackage[utf8]{inputenc}
+\usepackage{amsmath}
+\usepackage{mathtools}
+\usepackage{graphicx}
+\usepackage{subcaption}
+\usepackage{caption}
+\usepackage{float}
+\usepackage{geometry}
+\usepackage{physics}
+\geometry{margin=1in}
+
+\title{Generatorji naključnih števil}
+\author{Andrej Kolar-Požun, 28172042}
+
+
+
+\errorcontextlines 10000
+\begin{document}
+\pagenumbering{gobble}
+\maketitle
+\newpage
+\pagenumbering{arabic}
+\section{Prva naloga}
+
+Za začetek si oglejmo Box-Mullerjev generator naključnih števil.
+Generatorju damo za input dve naključni števili, porazdeljeni po enakomerni porazdelitvi med 0 in 1.
+Z Box-Mullerjevo transformacijo dobimo naključni števili porazdeljeni po standardni normalni porazdelitvi:
+\begin{align*}
+&Z_0 = \sqrt{-2 \ln U_1} \cos (2\pi U_2) \\
+&Z_1 = \sqrt{-2 \ln U_1} \sin (2\pi U_2)
+\end{align*}
+
+Obravnaval bom tudi konvolucijski generator naključnih števil, ki vzame 12 števil, porazdeljenih po enakomerni porazdelitvi med 0 in 1, in iz njih skonstruira novo:
+\begin{equation*}
+Z = \sum_{i=1}^6 X_i - \sum_{i=7}^{12} X_i
+\end{equation*}
+Spremenljivka Z naj bi spet bila porazdeljena po standradni normalni porazdelitvi, katere verjetnostna gostota se glasi:
+\begin{equation*}
+\frac{dP}{dx} = \frac{1}{\sqrt{2 \pi}} e^{-x^2/2}
+\end{equation*}
+
+
+Generatorja bom najprej testiral z Pearsonovim hi-kvadrat testom. Pri tem testu, razdelimo naš interval vrednosti naključno porazdeljenih spremenljivk na n razredov. Pearsonov test pravi, da je statistika
+\begin{equation*}
+N \sum_{i=1}^n \frac{(O_i/N - p_i)^2}{p_i}
+\end{equation*}
+Porazdeljena po porazdelitvi $\chi^2$ s $N-1$ prostorskimi stopnjami. V zgornji enačbi predstavlja n število razredov, N število naključno generiranih števil, $O_i$ število števil, ki je padlo v i-ti razred, $p_i$ pa verjetnost, da število pade v i-ti razred po pravi Gaussovi porazdelitvi. Pri izbiri števila razredov bo treba, da bo test veljaven, le paziti, da je za vsak i $O_i > 5$. Verjetnost $p_i$ pa se glasi:
+\begin{equation*}
+p_i = \int_{a_i}^{b_i} \frac{dP}{dx} dx = \frac{1}{2} \Big(erf\Big(\frac{b_i}{\sqrt{2}}\Big) - erf\Big(\frac{a_i}{\sqrt{2}}\Big)\Big)
+\end{equation*}
+
+
+
+
+Nato bom generatorja preveril še z Kolmogorov - Smirnov testom. Pri le-tem tvorimo statistiko:
+\begin{equation*}
+f(z) = \frac{k(z)}{N}
+\end{equation*}
+Kjer k(z) predstavlja število izmerkov, ki padejo pod z, N pa število vseh izmerkov. Torej nekako empirična kumulativna porazdelitev. Tole empirično kumulativno porazdelitev primerjamo s teoretično napovedjo z maksimalnim odmikom
+\begin{equation*}
+D = sup|F(z) - f(z)|*\sqrt{N}
+\end{equation*}
+ta pa je porazdeljen po znani Kolmogorovi porazdelitvi.
+
+Kumulativna standardna normalna porazdelitev se glasi:
+\begin{equation*}
+F(z) = \int_{-\infty}^{z} \frac{dP}{dx} dx = \frac{1}{2} \Big(1+erf\Big(\frac{z}{\sqrt{2}}\Big)\Big)
+\end{equation*}
+Oba testa sta na voljo v Pythonovi scipy.stats knjižnici. Metodi prikladno vrneta tudi p-vrednost kar bom upoarbil kot mero dobrega ujemanja teoretičnih in eksperimentalnih vrednost. P-vrednost nekako pomeni verjetnost, da bi, ob predpostavki, da so opažene vrednosti res porazdeljene po naši teoriji, dobili te opažene vrednosti. P vrednost blizu 1 bo torej pomenilo dobro ujemanje, p vrednost blizu nič pa slabo.  Navada je da si vnaprej izberemo določno stopnjo tveganja, za katero bom kot je v navadi vzel 0.05. Če P pade pod to vrednost hipotezo zavržemo in rečemo, da generator ne producira normalno porazdeljenih števil. 
+
+
+Poglejmo si najprej kako zgledajo porazdelitve, katere dajata generatorja:
+
+\begin{figure}[H]
+\centering
+\begin{subfigure}{.49\textwidth}
+\includegraphics[width=\linewidth]{prva/konvolucijski.pdf}
+\end{subfigure}
+\begin{subfigure}{.49\textwidth}
+\includegraphics[width=\linewidth]{prva/muller.pdf}
+\end{subfigure}
+\caption*{Izgleda, da generatorja res generirata normalno porazdeljena števila. Seveda je to opazno le pri dovolj veliko generiranih številih N. Tako na hitro bi rekel še, da Box-Mullerjev generator bolje deluje, saj vidimo, da je že pri N=500 zadevo veliko bolj podobna normalni porazdelitvi kot pri konvolucijskem generatorju.}
+\end{figure}
+
+Sedaj bom podrobneje stestiral Konvolucijski generator. Kot sem rekel bom to storil z gledanjem p-vrednosti:
+
+\begin{figure}[H]
+\centering
+\begin{subfigure}{.49\textwidth}
+\includegraphics[width=\linewidth]{prva/kolmogorovkonvol.pdf}
+\end{subfigure}
+\begin{subfigure}{.49\textwidth}
+\includegraphics[width=\linewidth]{prva/kolmogorovkonvol3.pdf}
+\end{subfigure}
+\caption*{P vrednost je pri manjših N porazdeljena po kar širokem intervalu(porazdelitev zgleda približno enakomerna), vsaka točka na grafu na levi je povprečje 10 zagnanih testov. Ta pridejo večja od moje izbrane meje 0.05. Na desnem grafu so P vrednosti še za večja števila N(tokrat brez kakih povprečevanj) in vidimo, da ta padejo proti ničli. Pri tako velikem številu podatkov postane test zelo strog glede kakšnih odstopanj(ki pa zagotovo so, čeprav majhna). Iz teh rezultat si ne upam kaj veliko trdit o ovračanju hipoteze in bom raje pogledal še druge metode.}
+\end{figure}
+\begin{figure}[H]
+\centering
+\begin{subfigure}{.49\textwidth}
+\includegraphics[width=\linewidth]{prva/kolmogorovkonvol2.pdf}
+\end{subfigure}
+\caption*{Tukaj pa je prikazan še D, torej supremum razmika med teoretično napovedjo in generiranih naključnih števil. Razmik za večje N lepo pada, kar namiguje na dobro ujemanje.Za natančneje zavračanje hipoteze za poljubno stopnjo tveganja bi moral D pomonžiti še z $\sqrt{N}$ in pogledati v tabele.}
+\end{figure}
+
+\begin{figure}[H]
+\centering
+\begin{subfigure}{.49\textwidth}
+\includegraphics[width=\linewidth]{prva/hi2konvol.pdf}
+\end{subfigure}
+\begin{subfigure}{.49\textwidth}
+\includegraphics[width=\linewidth]{prva/hi2konvol2.pdf}
+\end{subfigure}
+\caption*{Sedaj sem preizkusil še Pearsonov hi-kvadrat test. Obnašanje P-vrednosti je podobno, n označuje število razredov.}
+\end{figure}
+
+\begin{figure}[H]
+\centering
+\begin{subfigure}{.49\textwidth}
+\includegraphics[width=\linewidth]{prva/hi2konvol3.pdf}
+\end{subfigure}
+\caption*{Še reduciran hi-kvadrat(torej deljen z številom razredom manj ena). Podobno kot pri kolmogorovi statistiki tudi tukaj ta kaže dobro ujemanje in izgleda manj dvoumen kot P-vrednost.}
+\end{figure}
+
+P-vrednost nam torej pri obeh testih ne pove kaj veliko, saj je preveč razpršena. D in $\chi^2$ kažeta na ujemanje podatkov. Da se prepričam, si bom pogledal še tako imenovan Q-Q plot, kjer na x os plottamo teoretično pridobljene kvantile porazdelitve, na y os pa opažene vrednosti. Če sta porazdelitvi enaki, bi pridobljen plot moral biti premica:
+
+\begin{figure}[H]
+\centering
+\begin{subfigure}{.32\textwidth}
+\includegraphics[width=\linewidth]{prva/konvolqq1.pdf}
+\end{subfigure}
+\begin{subfigure}{.32\textwidth}
+\includegraphics[width=\linewidth]{prva/konvolqq2.pdf}
+\end{subfigure}
+\begin{subfigure}{.32\textwidth}
+\includegraphics[width=\linewidth]{konvolqq3.png}
+\end{subfigure}
+\caption*{Vidimo, da se lepo prilega, le na robu porazdelitve imamo outlierje. Verjetno ravno ti tako pokvarijo p vrednosti naših testov.}
+\end{figure}
+
+Vse skupaj bom za primerjavo ponovil še za Box-Mullerjev generator:
+
+\begin{figure}[H]
+\centering
+\begin{subfigure}{.49\textwidth}
+\includegraphics[width=\linewidth]{prva/kolmogorovmuller1.pdf}
+\end{subfigure}
+\begin{subfigure}{.49\textwidth}
+\includegraphics[width=\linewidth]{prva/kolmogorovmuller2.pdf}
+\end{subfigure}
+\caption*{V tem primeru so p vrednosti še vedno nekako enakomerno porazdeljene po določenem intervalu, a tokrat tudi pri večjem N. Ne vem točno kaj naj si mislim tukaj, itak sem rekel, da bom za preveranje ujemanja gledal druge stvari.}
+\end{figure}
+
+\begin{figure}[H]
+\centering
+\begin{subfigure}{.49\textwidth}
+\includegraphics[width=\linewidth]{prva/kolmogorovmuller3.pdf}
+\end{subfigure}
+\caption*{D vrednost z naraščanjem N lepo pada proti ničli - dobro ujemanje podatkov. Če pa se spomnemo konvolucijskega generatorja je ta padel na 0.02 že pri približno N=10000 in tam ostal. Tale pada počasneje.}
+\end{figure}
+
+\begin{figure}[H]
+\centering
+\begin{subfigure}{.49\textwidth}
+\includegraphics[width=\linewidth]{prva/hi2muller1.pdf}
+\end{subfigure}
+\begin{subfigure}{.49\textwidth}
+\includegraphics[width=\linewidth]{prva/hi2muller2.pdf}
+\end{subfigure}
+\caption*{Graf P-vrednosti prilagam zaradi kompletnosti. Vidim, da je spet podobna slika kot pri kolmogorovem testu.}
+\end{figure}
+
+\begin{figure}[H]
+\centering
+\begin{subfigure}{.49\textwidth}
+\includegraphics[width=\linewidth]{prva/hi2muller3.pdf}
+\end{subfigure}
+\caption*{Reduciran hi kvadrat je v tem primeru okoli 1, kar kaže na dobro ujemanje podatkov. Zanimivo, da je hi kvadrat 1 tudi za n=10, če spomnim, je pri konvolucijskem generatorju, ta narastel na čez 15.}
+\end{figure}
+
+\begin{figure}[H]
+\centering
+\begin{subfigure}{.32\textwidth}
+\includegraphics[width=\linewidth]{prva/mullerqq1.pdf}
+\end{subfigure}
+\begin{subfigure}{.32\textwidth}
+\includegraphics[width=\linewidth]{prva/mullerqq2.pdf}
+\end{subfigure}
+\begin{subfigure}{.32\textwidth}
+\includegraphics[width=\linewidth]{mullerqq3.png}
+\end{subfigure}
+\caption*{Q-Q plot kaže na ujemanje porazdelitev. Le za N=500 je to bolj slabo.}
+\end{figure}
+
+\begin{figure}[H]
+\centering
+\begin{subfigure}{.7\textwidth}
+\includegraphics[width=\linewidth]{prva/hitrosti.pdf}
+\end{subfigure}
+\caption*{Za konec pogledamo še hitrosti generatorjev in opazimo, da je Box-Mullerjev v vseh primerih hitrejši od konvolucijskega.}
+\end{figure}
+
+\begin{figure}[H]
+\centering
+\begin{subfigure}{.7\textwidth}
+\includegraphics[width=\linewidth]{prva/histogram.pdf}
+\end{subfigure}
+\caption*{To je še iz prvega dela naloga, ko sem rekel, da pridejo za majhne N p vrednosti naključno zgledajoče razporejene. Tukaj je histogram. Ne vidim, kakšne posebne porazdelitve tukaj, enakomerna ni (preveril s hi kvadrat testom).}
+\end{figure}
+
+\section{Dipolno sevanje}
+
+Sestavil bom generator po prostorskem kotu enakomerno porazdeljenih naključnih števil.
+
+
+Najprej bom razložil recept: Če želimo generirati naključna števila po neki porazdelitvi $f(x) = \frac{dP}{dx}$ s pomočjo danih generatorjev, ki vržejo ven enakomerno porazdeljena števila na intervalu med 0 in 1, moramo najprej izračunati kumulativno porazdelitev $F(x) = \int_{-\infty}^x \frac{dP}{dz}dz$ in jo obrniti $x = F^{-1}(u)$, kjer je sedaj x porazdeljena po $f$, $u$ pa je naša naključna številka med 0 in 1.
+
+Torej za po prostorskem kotu enakomerno porazdeljena števila imamo:
+\begin{align*}
+&\frac{dP}{d\Omega} = \frac{1}{4\pi} \\
+&\frac{dP}{dcos\theta} = \frac{1}{2} \\
+&\frac{dP}{d\phi} = \frac{1}{2\pi}
+\end{align*}
+Kumulativne porazdelitve pa so:
+\begin{align*}
+&F(cos\theta) = \frac{cos \theta}{2} + \frac{1}{2} \\
+&F(\phi) = \frac{\phi}{2\pi}
+\end{align*}
+Torej:
+\begin{align*}
+&cos\theta = 2u - 1 \\
+&\phi = 2\pi u 
+\end{align*}
+
+Poglejmo kako enakomerna porazdelitev zapolni površino krogle z radijem 1:
+\begin{figure}[H]
+\centering
+\begin{subfigure}{.49\textwidth}
+\includegraphics[width=\linewidth]{druga/enakom1.pdf}
+\end{subfigure}
+\begin{subfigure}{.49\textwidth}
+\includegraphics[width=\linewidth]{druga/enakom2.pdf}
+\end{subfigure}
+\end{figure}
+\begin{figure}[H]
+\centering
+\begin{subfigure}{.49\textwidth}
+\includegraphics[width=\linewidth]{druga/enakom3.pdf}
+\end{subfigure}
+\begin{subfigure}{.49\textwidth}
+\includegraphics[width=\linewidth]{enakom4.png}
+\end{subfigure}
+\caption*{Vsekakor zgleda porazdelitev enakomerna}
+\end{figure}
+
+\begin{figure}[H]
+\centering
+\begin{subfigure}{.7\textwidth}
+\includegraphics[width=\linewidth]{druga/zapoln.pdf}
+\end{subfigure}
+\caption*{Test generatorja: Želim preveriti enakomerno pokritje prostorskega kota $d\Omega = d\cos\theta d\phi$. Intervale $\cos\theta \in [0,\pi]$ in $\phi \in [0,2\pi]$ sem razdelil na 10 delov in gledal v katere oddelke pade najmanj števil. Slika potrdi, da ni določenega območja v katerega bi padlo občutno manj števil kot drugod.}
+\end{figure}
+
+Obravnavajmo še dipolno sevanje kjer 
+\begin{align*}
+&\frac{dP}{d\Omega} = A \sin^2 \theta \\
+&1 = 2A\pi \int_0^\pi \sin^2\theta \sin\theta d\theta = \frac{A\pi 8}{3} \\
+&A = \frac{3}{8\pi} \\
+&\frac{dP}{d\phi} = \frac{1}{2\pi} \\
+&\phi = 2\pi u \\
+&\frac{dP}{d\theta} = 2\pi A \sin^3 \theta \\
+&F(\theta) = 2\pi A \frac{4}{3} \sin^4(\theta/2)(\cos\theta + 2) 
+\end{align*}
+
+Kumulativno porazdelitev po theta ne moremo preprosto invertirati in jo bom reševal numerično s funkcijo fsolve.
+
+\begin{figure}[H]
+\centering
+\begin{subfigure}{.32\textwidth}
+\includegraphics[width=\linewidth]{druga/dipol1.pdf}
+\end{subfigure}
+\begin{subfigure}{.32\textwidth}
+\includegraphics[width=\linewidth]{druga/dipol2.pdf}
+\end{subfigure}
+\begin{subfigure}{.32\textwidth}
+\includegraphics[width=\linewidth]{druga/dipol3.pdf}
+\end{subfigure}
+\caption*{Ne vidi se najbolje razlika med dipolno in enakomerno porazdelitvijo, zato bom pogledal posebej še porazdelitve po theti za vsako.}
+\end{figure}
+
+\begin{figure}[H]
+\centering
+\begin{subfigure}{.7\textwidth}
+\includegraphics[width=\linewidth]{druga/graf1.pdf}
+\end{subfigure}
+\caption*{Porazdelitev fi je enakomerna za oba generatorja}
+\end{figure}
+
+\begin{figure}[H]
+\centering
+\begin{subfigure}{.49\textwidth}
+\includegraphics[width=\linewidth]{druga/graf2.pdf}
+\end{subfigure}
+\begin{subfigure}{.49\textwidth}
+\includegraphics[width=\linewidth]{druga/graf3.pdf}
+\end{subfigure}
+\caption*{Tukaj se lepše vidi, da imamo pri dipolni porazdelitvi ostrejši vrh pri $\pi/2$.}
+\end{figure}
+
+Poglejmo si še nekaj momentov porazdelitev:
+\begin{center}
+\begin{tabular}{|c|c|c|}
+\hline
+& Enakomerna & Dipolna \\ \hline
+$\cos\theta$ & -0.004 & $0.005$\\ \hline
+$\cos^2\theta$ & 0.33& $0.2$\\ \hline
+$\cos^3\theta$ & 0.0009 &0.001\\ \hline
+$Y_{10}(\theta)$ & 0.48 & 0.48\\ \hline
+$Y_{20}(\theta)$ & 0.63 & 0.63\\ \hline
+$Y_{30}(\theta)$ & 0.74 & 0.74 \\ \hline
+\end{tabular}
+\end{center}
+
+Poglejmo še kako se spreminjajo variance momentov ko povečujemo velikost vzorca:
+
+\begin{figure}[H]
+\centering
+\begin{subfigure}{.49\textwidth}
+\includegraphics[width=\linewidth]{druga/variacije1.pdf}
+\end{subfigure}
+\begin{subfigure}{.49\textwidth}
+\includegraphics[width=\linewidth]{druga/variacije2.pdf}
+\end{subfigure}
+\caption*{Tukaj sem računal variance povprečja po definiciji $\sigma^2_x = <(x-<x>)^2>$, kjer je bilo x povprečje N izmerkov. Za sferne harmonike je vrednost varianc zelo majhna (Pride nekaj na potenco -30)}
+\end{figure}
+
+\section{Časi oddaje nalog}
+
+Dane imamo podatke časov oddaje vseh nalog modelske analize za letnik 10 in letnik 11. Tukaj bom preveril ali se ti statistično ujemajo.
+Naloge se bom spet lotil s Kolmogorov-Smirnovim testom, kjer bom primerjal kumulativni porazdelitvi obeh letnikov za vsako nalogo. Uporabil bom scipyjevo 
+funkcijo ks2samp.
+
+\begin{figure}[H]
+\centering
+\begin{subfigure}{.7\textwidth}
+\includegraphics[width=\linewidth]{tretja/1011.pdf}
+\end{subfigure}
+\end{figure}
+\begin{figure}[H]
+\centering
+\begin{subfigure}{.7\textwidth}
+\includegraphics[width=\linewidth]{tretja/1013.pdf}
+\end{subfigure}
+\end{figure}
+\begin{figure}[H]
+\centering
+\begin{subfigure}{.7\textwidth}
+\includegraphics[width=\linewidth]{tretja/1113.pdf}
+\end{subfigure}
+\end{figure}
+
+
+Tukaj ne bom veliko raziskoval, le za prvo nalogo bom pogledal s kakšnim tveganjem lahko rečemo, da so leta 10 in 11 študenti oddajali po isti porazdelitvi.
+
+Pri primerjavi dveh vzorcev Kolmogorov narekuje takšen postopek. Kot pri enem vzorcu tvorimo emprično kumulativno porazdelitev, tokrat za oba vzorca in pogledamo:
+\begin{equation*}
+D_{n,m} = sup|F_{1,n} - F_{2,n}||
+\end{equation*}
+
+Ujemanje pri stopnji tveganja $\alpha$ zavržemo, če
+\begin{align*}
+&D_{n,m} > c(\alpha) \sqrt{\frac{n+m}{nm}} \\
+&c(\alpha) = \sqrt{-0.5 ln(\alpha/2)}
+\end{align*}
+
+Torej če npr primerjamo prvo nalogo med letniki 10 in 11 je n enak 11, m pa 22. Za stopnjo tveganja izberimo tipičen 0.05. D pa je tam nekje 0.23.
+\begin{equation*}
+0.23 > \sqrt{-0.5 ln(0.05/2)} \sqrt{\frac{33}{11*22}} = 0.5
+\end{equation*}
+
+Torej pri stopnji tveganja 0.05 ne moremo zavreči trditve, da vzorca pripadata isti porazdelitvi.
+\end{document}

@@ -1,0 +1,373 @@
+\documentclass{article}
+
+\usepackage[utf8]{inputenc}
+\usepackage{amsmath}
+\usepackage{graphicx}
+\usepackage{subcaption}
+\usepackage{caption}
+\usepackage{float}
+\usepackage{geometry}
+\usepackage{physics}
+\geometry{margin=1in}
+
+\title{Populacijski modeli}
+\author{Andrej Kolar-Požun, 28172042}
+
+
+
+\errorcontextlines 10000
+\begin{document}
+\pagenumbering{gobble}
+\maketitle
+\newpage
+\pagenumbering{arabic}
+\section{Zajci - lisice}
+
+Model opisuje sistem dveh diferencialnih enačb
+\begin{align*}
+&\dot{Z} = \alpha Z - \beta Z L \\
+&\dot{L} = -\gamma L + \delta Z L
+\end{align*}
+Kjer Z označuje število zajcev, L pa število lisic.
+Uvedimo naslednje spremenljivke:
+\begin{align*}
+&l = \frac{\beta}{\alpha} L\\
+&z = \frac{\delta}{\gamma} Z\\
+&\tau = t \sqrt{\alpha \gamma}\\
+&p = \sqrt{\frac{\alpha}{\gamma}} \\
+\end{align*}
+Sistem se v novih spremenljivkah poenostavi in ima le en prosti parameter p:
+\begin{align*}
+&\dot{z} = pz(1-l) \\
+&\dot{l} = \frac{l}{p}(z-1)
+\end{align*}
+Zastojne točke(odvoda sta enaka nič) so $(z,l) = (0,0)$ in $(z,l)=(1,1)$.
+Z razvojem okoli le-teh, lahko ugotovimo, če so zastojne točke stabilne.
+
+V bližini točke (0,0) lahko naš sistem približno zapišemo in hitro rešimo:
+\begin{align*}
+&\dot{z} = pz \\
+&\dot{l} = -l/p \\
+&z(\tau) = z(0)e^{p \tau} \\
+&l(\tau) = l(0)e^{-\tau/p}
+\end{align*}
+Točka torej ni stabilna, saj se pri majhnem premiku števila zajcev eksponentno odpeljemo proč.
+
+Poglejmo si še točko (1,1):
+\begin{align*}
+&\dot{z} = p(1-l) \\
+&\dot{l} = (z-1)/p \\
+&z(t) = (1-l(0))\sqrt{p}\  sin(\tau/\sqrt{p}) + (z(0)-1) cos(\tau/\sqrt{p}) + 1 \\
+&l(t) = (l(0)-1)cos(\tau/\sqrt{p}) + (z(0)-1)/\sqrt{p}\  sin(\tau/\sqrt{p}) + 1
+\end{align*}
+Tokrat so rešitve oscilacije, kar je stabilneje.
+\newpage
+Poglejmo si nekaj faznih portretov(do časa $\tau = 20$):
+
+\begin{figure}[H]
+\centering
+\begin{subfigure}{.49\textwidth}
+\includegraphics[width=\linewidth]{volterra/1.pdf}
+\end{subfigure}
+\begin{subfigure}{.49\textwidth}
+\includegraphics[width=\linewidth]{volterra/4.pdf}
+\end{subfigure}
+\caption*{Lepo se vidi, da ima x=1 najkrajšo orbito, pri manjšem ali večjem x pa se ta veča. Podobno velja za začetni pogoj v lisicah.}
+\end{figure}
+
+\begin{figure}[H]
+\centering
+\begin{subfigure}{.49\textwidth}
+\includegraphics[width=\linewidth]{volterra/2.pdf}
+\end{subfigure}
+\begin{subfigure}{.49\textwidth}
+\includegraphics[width=\linewidth]{volterra/3.pdf}
+\end{subfigure}
+\caption*{Tudi z večanjem p-ja se orbite daljšajo}
+\end{figure}
+
+\begin{figure}[H]
+\centering
+\includegraphics[width=.5\linewidth]{volterra/5.pdf}
+\caption*{Če oboje združimo, dobimo še večje orbite. Opazimo še, da so tudi veliko bolj skupaj}
+\end{figure}
+
+\begin{figure}[H]
+\centering
+\begin{subfigure}{.49\textwidth}
+\includegraphics[width=\linewidth]{volterra/7.pdf}
+\end{subfigure}
+\begin{subfigure}{.49\textwidth}
+\includegraphics[width=\linewidth]{volterra/8.pdf}
+\end{subfigure}
+\caption*{Tukaj smo obrnili naše začetne pogoje in vidimo, da to podaljša orbite. Opazimo tudi, da jih večanje p še vedno poveča, razen najmanjše, ki ostane približno enaka. To bi lahko bilo povezano s prej izpeljanim stabilnejšim obnašanjem v bližini točke (1,1). Nasprotno pa vidimo, da se pri približanju točki (0,0) odpeljemo daleč stran.}
+\end{figure}
+
+\begin{figure}[H]
+\centering
+\begin{subfigure}{.49\textwidth}
+\includegraphics[width=\linewidth]{volterra/9.pdf}
+\end{subfigure}
+\begin{subfigure}{.49\textwidth}
+\includegraphics[width=\linewidth]{volterra/10.pdf}
+\end{subfigure}
+\caption*{Pri takih začetnih pogojih vidimo nekaj drugega in sicer, da je za najkrajše orbite povečevanje parametra p celo zmanjšalo orbito. Pri najdaljši orbiti pa sem tukaj moral celo povečati končni čas na 25, da se je sploh zaključila.}
+\end{figure}
+\newpage
+Videli smo, da na faznih portretih dobimo zaključene orbite. Koliko časa pa natančneje potrebujemo, da pridemo spet v isto točko?
+
+\begin{figure}[H]
+\centering
+\begin{subfigure}{.49\textwidth}
+\includegraphics[width=\linewidth]{volterra/cas.pdf}
+\end{subfigure}
+\begin{subfigure}{.49\textwidth}
+\includegraphics[width=\linewidth]{volterra/cas2.pdf}
+\end{subfigure}
+\caption*{Za p=1 je funkcija kar položna, pri večjih p pa postane kar živahno. Na desnem grafu pade perioda celo na nič in je posredi očitno neka napaka.}
+\end{figure}
+
+Zanimiv rezultat je tudi viden spodaj. Pri preredki diskretizaciji časa začenjajo fazni diagrami izgledati čisto drugače. Metoda Runge Kutte(Čeprav je z adaptivnim korakom) je očitno vseeno stabilnejša če se skozi prostor pomikamo po majhnih korakih.
+\begin{figure}[H]
+\centering
+\begin{subfigure}{.49\textwidth}
+\includegraphics[width=\linewidth]{volterra/kaos.pdf}
+\end{subfigure}
+\begin{subfigure}{.49\textwidth}
+\includegraphics[width=\linewidth]{volterra/kaos2.pdf}
+\end{subfigure}
+\end{figure}
+\newpage
+\section{Laser}
+Populacijski model laserja opišemo z naslednjim sistemom, kjer je črka f povezana z nastalimi fotoni, črka a pa številom atomov v določenem stanju. Q predstavlja črpanje laserja.
+\begin{align*}
+&\dot{f} = -B f + Daf \\
+&\dot{a} = -C a - E a f + Q
+\end{align*}
+
+Problem lahko spet pretvorimo v preprostejšo obliko:
+\begin{align*}
+&A = D/B \ a \\
+&F = E/C \ f \\
+&p = \sqrt{C/B}\\
+&\tau = t\sqrt{BC}\\
+&q = EQ/\sqrt{B^3 C} \\
+&\dot{A} = q - pA(F+1) \\
+&\dot{F} = F/p\  (A-1)
+\end{align*}
+
+\begin{figure}[H]
+\centering
+\begin{subfigure}{.49\textwidth}
+\includegraphics[width=\linewidth]{laser/1.pdf}
+\end{subfigure}
+\begin{subfigure}{.49\textwidth}
+\includegraphics[width=\linewidth]{laser/2.pdf}
+\end{subfigure}
+\caption*{Na obeh grafih se vidi, da povečevanje črpanja zmanjšuje relaksacijski čas in povečuje frekvenco oscilacij(Na sliki čas od 0.1 naprej, zelo hitro pridemo iz začetnih 10 na to kar je na sliki)}
+\end{figure}
+\begin{figure}[H]
+\centering
+\begin{subfigure}{.49\textwidth}
+\includegraphics[width=\linewidth]{laser/3.pdf}
+\end{subfigure}
+\begin{subfigure}{.49\textwidth}
+\includegraphics[width=\linewidth]{laser/4.pdf}
+\end{subfigure}
+\caption*{Vidimo, da sprememba začetnih pogojev ne vpliva vidno na stanja, ki niso pri majhnih časih. Pri sliki A(t) sprememba na skali, kakršna je na zgornjem grafu sploh ni vidna, saj pridemo iz začetnega stanja do stanja $A(t) \approx 1$ v času, manjšem kot 0.01}
+\end{figure}
+\begin{figure}[H]
+\centering
+\begin{subfigure}{.49\textwidth}
+\includegraphics[width=\linewidth]{laser/5.pdf}
+\end{subfigure}
+\begin{subfigure}{.49\textwidth}
+\includegraphics[width=\linewidth]{laser/6.pdf}
+\end{subfigure}
+\caption*{Tukaj se vidi da manjši p poveča frekvenco oscilacij. Pri p, večjem od približno 0.5 oscilacij sploh ni.}
+\end{figure}
+
+\begin{figure}[H]
+\centering
+\begin{subfigure}{.49\textwidth}
+\includegraphics[width=\linewidth]{laser/7.pdf}
+\end{subfigure}
+\begin{subfigure}{.49\textwidth}
+\includegraphics[width=\linewidth]{laser/8.pdf}
+\end{subfigure}
+\caption*{Podobna slika še za q=4}
+\end{figure}
+
+\begin{figure}[H]
+\centering
+\begin{subfigure}{.49\textwidth}
+\includegraphics[width=\linewidth]{laser/9.pdf}
+\end{subfigure}
+\caption*{Odvisnost oblike grafa od začetnega stanja še v logaritemski skali. Vidimo, da to ne vpliva na obliko grafa.}
+\end{figure}
+
+Kot pri zajcih in lisicah, si lahko tudi tukaj pogledamo stacionarne točke in raziščemo obnašanje okoli njih:
+\begin{align*}
+&(A,F) = (q/p,0)\\
+&(A,F) = (1,q/p - 1)
+\end{align*}
+
+\begin{figure}[H]
+\centering
+\begin{subfigure}{.49\textwidth}
+\includegraphics[width=\linewidth]{laser/stac.pdf}
+\end{subfigure}
+\begin{subfigure}{.49\textwidth}
+\includegraphics[width=\linewidth]{laser/stac2.pdf}
+\end{subfigure}
+\caption*{Na levi vidimo, da se nič zanimivega ne zgodi pri majhnem premiku v številu fotonov, na desni pa imamo konstantno vrednost F(t) tudi pri zelo velikih odmikih od stacionarne točke, če je le število fotonov nič(kar je pričakovano če pogledamo enačbo)}
+\end{figure}
+\begin{figure}[H]
+\centering
+\begin{subfigure}{.49\textwidth}
+\includegraphics[width=\linewidth]{laser/stac3.pdf}
+\end{subfigure}
+\begin{subfigure}{.49\textwidth}
+\includegraphics[width=\linewidth]{laser/stac4.pdf}
+\end{subfigure}
+\caption*{Spet nič posebnega.}
+\end{figure}
+
+\begin{figure}[H]
+\centering
+\begin{subfigure}{.49\textwidth}
+\includegraphics[width=\linewidth]{laser/stac5.pdf}
+\end{subfigure}
+\begin{subfigure}{.49\textwidth}
+\includegraphics[width=\linewidth]{laser/stac6.pdf}
+\end{subfigure}
+\caption*{Pri F(t) tokrat pri isti časovni skali ni viden tisti začetni skok.}
+\end{figure}
+
+\begin{figure}[H]
+\centering
+\begin{subfigure}{.49\textwidth}
+\includegraphics[width=\linewidth]{laser/stac7.pdf}
+\end{subfigure}
+\begin{subfigure}{.49\textwidth}
+\includegraphics[width=\linewidth]{laser/stac8.pdf}
+\end{subfigure}
+\caption*{A(t) se komaj kaj spreminja.}
+\end{figure}
+
+
+\section{Epidemija}
+
+Širjenje epidemije opišemo z naslednjim sistemom enačb:
+\begin{align*}
+&\dot{D} = - \alpha D B \\
+&\dot{B} = \alpha D B - \beta B \\
+&\dot{I} = \beta B
+\end{align*}
+Zmanjšamo število parametrov s preprosto substitucijo:
+\begin{align*}
+&\tau = t*\alpha \\
+&p = \beta / \alpha \\
+&\dot{D} = - D B \\
+&\dot{B} = D B - p B \\
+&\dot{I} = p B
+\end{align*}
+
+Zdaj pa nekaj slik za predstavo:
+
+\begin{figure}[H]
+\centering
+\begin{subfigure}{.49\textwidth}
+\includegraphics[width=\linewidth]{epidemija/1.pdf}
+\end{subfigure}
+\begin{subfigure}{.49\textwidth}
+\includegraphics[width=\linewidth]{epidemija/2.pdf}
+\end{subfigure}
+\caption*{Povečevanje p-ja povzroči, da prej dosežemo ravnovesje.}
+\end{figure}
+
+\begin{figure}[H]
+\centering
+\begin{subfigure}{.49\textwidth}
+\includegraphics[width=\linewidth]{epidemija/3.pdf}
+\end{subfigure}
+\begin{subfigure}{.49\textwidth}
+\includegraphics[width=\linewidth]{epidemija/4.pdf}
+\end{subfigure}
+\end{figure}
+\begin{figure}[H]
+\centering
+\begin{subfigure}{.49\textwidth}
+\includegraphics[width=\linewidth]{epidemija/5.pdf}
+\end{subfigure}
+\begin{subfigure}{.49\textwidth}
+\includegraphics[width=\linewidth]{epidemija/6.pdf}
+\end{subfigure}
+\end{figure}
+
+Zanima nas kdaj podrobneje nastopi maksimum obolelih in koliko jih takrat je v odvisnosti od parametrov p in začetnih pogojev:
+
+\begin{figure}[H]
+\centering
+\begin{subfigure}{.49\textwidth}
+\includegraphics[width=\linewidth]{epidemija/maxp1.pdf}
+\end{subfigure}
+\begin{subfigure}{.49\textwidth}
+\includegraphics[width=\linewidth]{epidemija/maxp2.pdf}
+\end{subfigure}
+\caption*{Moder graf nam pove ob katerem času nastopi maksimum, rdeči pa koliko je takrat bolanih.}
+\end{figure}
+
+Videli smo, da pri večjem začetnem število obolenih vrh nastopi skoraj ob času nič. S cepljenjem populacije bi lahko zmanjšali začetno število dovzetnih napram številu bolnih in tako prišli do režima, ki ga zgornja grafa opisujeta pri večjih x. Pri cepitvi več ljudi bi torej vrh pomikali zmeraj bolj proti levo v časovni skali, optimalno bi bilo, če bi ga dali kar na t=0. Še grafa:
+
+\begin{figure}[H]
+\centering
+\begin{subfigure}{.49\textwidth}
+\includegraphics[width=\linewidth]{epidemija/imun.pdf}
+\end{subfigure}
+\begin{subfigure}{.49\textwidth}
+\includegraphics[width=\linewidth]{epidemija/imun2.pdf}
+\end{subfigure}
+\caption*{Rezultat. Zgleda čudno, glede na to, da je profesor na predavanjih dejal, da se izkaže, da jih je treba le okoli 60 procentov cepiti. Vsi ti časi so sicer še dokaj majhni, mogoče naj bi še to že štelo kot "maksimum je na začetku"?}
+\end{figure}
+
+
+Za konec si na hitro poglejmo kako se potek bolezni spremeni, če ima ta več faz, kar opišemo z naslednjim sistemom:
+\begin{align*}
+&\dot{D} = -\alpha D B_1 \\
+&\dot{B_1} = \alpha D B_1 - \beta_1  B_1 \\
+&\dot{B_2} = \beta_1 B_1 - \beta_2 B_2 \\
+&\dot{I} = \beta_2 B_2
+\end{align*}
+
+\begin{figure}[H]
+\centering
+\begin{subfigure}{.49\textwidth}
+\includegraphics[width=\linewidth]{epidemija/dodatna.pdf}
+\end{subfigure}
+\begin{subfigure}{.49\textwidth}
+\includegraphics[width=\linewidth]{epidemija/dodatna4.pdf}
+\end{subfigure}
+\end{figure}
+
+\begin{figure}[H]
+\centering
+\begin{subfigure}{.49\textwidth}
+\includegraphics[width=\linewidth]{epidemija/dodatna3.pdf}
+\end{subfigure}
+\begin{subfigure}{.49\textwidth}
+\includegraphics[width=\linewidth]{epidemija/dodatna5.pdf}
+\end{subfigure}
+\end{figure}
+
+\begin{figure}[H]
+\centering
+\begin{subfigure}{.49\textwidth}
+\includegraphics[width=\linewidth]{epidemija/dodatna2.pdf}
+\end{subfigure}
+\begin{subfigure}{.49\textwidth}
+\includegraphics[width=\linewidth]{epidemija/dodatna6.pdf}
+\end{subfigure}
+\caption*{Na tej desni sliki(in tudi zgoraj, ko so vsi parametri enaki 1) je zanimivo, da takoj postanejo VSI dovzetni bolani, potem pa od tam naprej pocasi postajajo imuni.}
+\end{figure}
+\end{document}

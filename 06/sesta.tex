@@ -1,0 +1,329 @@
+\documentclass{article}
+
+\usepackage[utf8]{inputenc}
+\usepackage{amsmath}
+\usepackage{mathtools}
+\usepackage{graphicx}
+\usepackage{subcaption}
+\usepackage{caption}
+\usepackage{float}
+\usepackage{geometry}
+\usepackage{physics}
+\geometry{margin=1in}
+
+\title{Luščenje modelskih parametrov: linearni modeli}
+\author{Andrej Kolar-Požun, 28172042}
+
+
+
+\errorcontextlines 10000
+\begin{document}
+\pagenumbering{gobble}
+\maketitle
+\newpage
+\pagenumbering{arabic}
+\section{Odziv tkiv}
+
+Za odziv tkiv na različne reagente privzamemo naslednjo reakcijo:
+\begin{equation*}
+Y + X \rightleftharpoons Y^* 
+\end{equation*}
+Ko jo rešimo, dobimo v ravnovesju zvezo
+\begin{equation*}
+y = \frac{y_0 x}{x+a}
+\end{equation*}
+Kjer je $y_0$ nasičeni odziv tkiva in $a$ koncentracija, potrebna za odziv, ki je enak polovici nasičenega.
+
+Naša naloga je iz merskih podatkov določiti parametra $y_0$ in $a$. Najprej bom z uvedbo novih spremenljivk enačbo lineariziral:
+\begin{align*}
+&\frac{1}{y} = \frac{1}{y_0} + \frac{a}{y_0}\frac{1}{x} \\
+&\frac{1}{y} \rightarrow y \\
+&\frac{1}{x} \rightarrow x \\
+&y = \frac{1}{y_0} + \frac{a}{y_0} x
+\end{align*}
+
+Pogledati moramo še, kako se pri taki spremembi spremenljivk transformirajo napake:
+\begin{equation*}
+\frac{1}{y_i + \sigma_i} = \frac{1}{y_i(1+\sigma_i/y_i)} = \frac{1}{y_i} + \frac{\sigma_i}{y_i^2}
+\end{equation*}
+
+Za tak linearni model minimizacija hi kvadrata, da naslednje parametre:
+\begin{align*}
+&\frac{1}{y_0} = \frac{A_{xx}A_y - A_xA_{xy}}{A_{xx}A - A_x^2}\\
+&\frac{a}{y_0} = \frac{AA_{xy} - A_x A_y}{A_{xx}A - A_x^2} \\
+&A = \sum_i \frac{1}{\sigma_i^2} \\
+&A_x = \sum_i \frac{x_i}{\sigma_i^2} \\
+&\sigma^2(y_0) = \frac{A_{xx}}{A_{xx}A - A_x^2} \\
+&\sigma^2(a) = \frac{A}{A_{xx}A - A_x^2} \\
+&cov(y_0,a) = \frac{-A_x}{A_{xx}A - A_x^2} \\
+\end{align*}
+
+Za splošen model:
+\begin{align*}
+&y_i = a_1 \phi_1(x_i) + a_2  \phi_2(x_i) + ... + a_m \phi_m(x_i) \\
+&Ax = b \\
+&A_{i,j} = \phi_j(x_i)/\sigma_i \\
+&b_i = y_i/\sigma_i \\
+&x_i = a_i
+\end{align*}
+
+S pomočjo SVD matrike A lahko dobimo optimalne parametre x kot:
+\begin{align*}
+&A = USV^T \\
+&x = \sum_{i=1}^m \frac{U_i * b}{s_i} V_i \\
+&\sigma^2(a_j) = \sum_{i = 1}^m \Big(\frac{V_{ji}}{s_i}\Big)^2 \\
+&cov(a_j,a_k) = \sum_{i=1}^m \frac{V_{ji}V_{ki}}{s_i^2}
+\end{align*}
+
+Za mero fita bom uporabljal računal hi kvadrat:
+\begin{align*}
+& \chi^2 = \sum_{i=1}^N \frac{(y_i-f(x_i))^2}{\sigma_i^2} \\
+\end{align*}
+Kjer N označuje število izmerkov, $f(x_i)$ pa je naš model.
+Pogosto bom raje delal z reduciranim hi-kvadratom $\chi^2/(N-M)$, kjer je M število parametrov. Za tak reduciran hi kvadrat ustreza vrednost 1 dobremu fitu.
+
+\begin{figure}[H]
+\begin{subfigure}{\textwidth}
+\includegraphics[width=\linewidth]{prva/anal.pdf}
+\end{subfigure}
+\caption*{Analitična rešitev naloge po prvi zgornji formuli. Primerni parametri so $y_0 = 104.7, a=21.2$, na sliki pa je nereduciran $\chi^2$. Rešitev s pomočjo SVD ter pythonova funkcija polyfit sta dali isti rezultat za $\chi^2$}
+\end{figure}
+\begin{figure}[H]
+\begin{subfigure}{\textwidth}
+\includegraphics[width=\linewidth]{prva/netransf.pdf}
+\end{subfigure}
+\caption*{Tako izgledajo naši podatki in najboljši fit v recipročnih spremenljivkah. Napake za nekatere vrednosti postanje zelo velike, kar fit primerno upošteva. Nereduciran  hi kvadrat je tokrat 6.2}
+\end{figure}
+\newpage
+\section{Magnetni spektrometer}
+
+Želimo sestaviti model, ki bi nam iz izmerjenih količin na detektorju spektrometra dal parametre trajektorije delcev.
+Podane imamo izmerjene disperzijske kote na tarči, ter kote in položaje na detektorju. Dobiti hočemo zvezo med prvim in drugim.
+Za napako izmerjenega kota na tarči bom vzel 0.06 stopinje.
+
+Najprej bom izmerjene disperzijske kote na tarči najprej narisal v odivnosti od kotov in položajev na detektorju, da dobim neko idejo za kakšne funkcije bo šlo:
+
+\begin{figure}[H]
+\begin{subfigure}{\textwidth}
+\includegraphics[width=\linewidth]{druga/scatter.pdf}
+\end{subfigure}
+\caption*{Ne vidi se ravno veliko, pravzaprav zgleda kot da je zveza linearna, najbolje, da kar poskusim par možnosti in preverim..}
+\end{figure}
+
+Preizkusil bom sledeč model:
+\begin{equation*}
+\theta_{tg} =  a_0 + b_0 x_{fp} + a_2 x_{fp}^2 + ... + a_p x_{fp}^p + b_1 \theta_{fp} + b_2 \theta_{fp}^2 + ... + b_r \theta_{fp}^r
+\end{equation*}
+
+\begin{figure}[H]
+\begin{subfigure}{\textwidth}
+\includegraphics[width=\linewidth]{druga/potence.pdf}
+\end{subfigure}
+\caption*{Na zgornji sliki vidimo, da povečevanje p-ja zniža vrednost $\chi^2$ in se pri p=4 začenja že ustalit. Izgleda tudi, da pridemo do minimuma prvič nekje pri r=4, pri r=7 pa $\chi^2$ začne naraščat.}
+\end{figure}
+
+Zaenkrat bom za model vzel p=r=4, zraven pa bom dodal še mešane člene :
+\begin{equation*}
+\theta_{tg} =  \theta_{tg}' + c_1 (x_{fp}\theta_{fp}) + ... + c_q (x_{fp} \theta_{fp})^q
+\end{equation*}
+Kjer sem z $\theta'$ označil prejšnji najboljši model.
+\begin{figure}[H]
+\begin{subfigure}{\textwidth}
+\includegraphics[width=\linewidth]{druga/mesani.pdf}
+\end{subfigure}
+\caption*{Na zgornji sliki vidimo, da nam nekaj dodatnih mešanih členov še zmanjša reduciran $\chi^2$. Če q povečamo na 4, se hi kvadrat poveča na čez 100, pri q=5 pa je že čez 1000. V moj model bom torej dal še en mešan člen prve potence, saj višje potence ne vplivajo veliko.}
+\end{figure}
+
+Mešani členi so kar pomagali, tako da jih bom dodal še nekaj malo drugačnih:
+\begin{equation*}
+\theta_{tg} = \theta_{tg}' + d_{21}(x_{fp}^2 \theta_{fp}) + d_{22} (x_{fp}^2 \theta_{fp})^2 + .. d_{2s}(x_{fp}^2 \theta_{fp})^s + d_{31}(x_{fp}^3 \theta_{fp}) + .. + d_{t1}(x_{fp}^t \theta_{fp})
+\end{equation*}
+
+\begin{figure}[H]
+\begin{subfigure}{.49\textwidth}
+\includegraphics[width=\linewidth]{druga/mesani2.pdf}
+\end{subfigure}
+\begin{subfigure}{.49\textwidth}
+\includegraphics[width=\linewidth]{druga/mesani3.pdf}
+\end{subfigure}
+\caption*{Vidimo, da členi take vrste večinoma zelo poslabšajo model. Na desnem grafu je isti model, le da je vloga x in $\theta_{fp}$ zamenjana. Samo za s=1 se model ne poslabša in dobimo hi kvadrat spet okoli 50.}
+\end{figure}
+
+Dodajmo še člene z negativnimi potencami:
+\begin{equation*}
+\theta_{tg} = \theta_{tg}' + a_1 x_{fp}^{-1} + ... + a_p x_{fp}^{-p} + b_1 \theta_{fp}^{-1} + ... + b_r \theta_{fp}^{-r}
+\end{equation*}
+
+\begin{figure}[H]
+\begin{subfigure}{\textwidth}
+\includegraphics[width=\linewidth]{druga/kvocienti.pdf}
+\end{subfigure}
+\caption*{Spet vidimo, da taki dodatni členi ne vplivajo veliko na naš $\chi^2$. Mimogrede, p in r v naslovu sta mišljena ta dva iz prejšnjega modela, ko so potence pozitivne.}
+\end{figure}
+\newpage
+Poskusimo še z mešanimi členi v imenovalcu:
+\begin{equation*}
+\theta_{tg} = \theta_{tg}' + a_1 (x_{fp}\theta_{fp})^{-1} + ... + a_s (x_{fp}\theta_{fp})^{-s}
+\end{equation*}
+
+\begin{figure}[H]
+\begin{subfigure}{\textwidth}
+\includegraphics[width=\linewidth]{druga/kvocienti2.pdf}
+\end{subfigure}
+\caption*{Tudi to nič ne pomaga}
+\end{figure}
+
+Poskusil bom še z:
+\begin{equation*}
+\theta_{tg} = \theta_{tg}' + a_1 (x_{fp}/\theta_{fp}) + ... + a_s (x_{fp}/\theta_{fp})^{s}
+\end{equation*}
+
+\begin{figure}[H]
+\begin{subfigure}{\textwidth}
+\includegraphics[width=\linewidth]{druga/kvocientimesani.pdf}
+\end{subfigure}
+\caption*{V legendi piše kateri kvocient sem preverjal. Za $s>3$ spet veliko naraste. In spet dodajanje kvocientnih členov ne izboljša veliko hi kvadrata}
+\end{figure}
+
+Še ena ideja bi bila, da bi se vrnili na naš začetni model, ko smo imeli le potence posameznih spremenljivk brez mešanih členov. Ali bi dobili boljši približek, če bi namesto navadnih potenc uporabili specialne polinome kot so na primer Legendrovi ali Čebiševi? Poglejmo torej model:
+\begin{equation*}
+\theta_{tg} = a (x_{fp} \theta_{fp}) + a_0 P_0(x_{fp}) + ... a_p P_p(x_{fp}) + b_0 P_0(\theta_{fp}) + ... + b_r P_r(\theta_{fp})
+\end{equation*}
+
+Kjer sem z P označil nek specialen polinom.
+
+\begin{figure}[H]
+\begin{subfigure}{.49\textwidth}
+\includegraphics[width=\linewidth]{druga/specialni.pdf}
+\end{subfigure}
+\begin{subfigure}{.49\textwidth}
+\includegraphics[width=\linewidth]{druga/specialni2.pdf}
+\end{subfigure}
+\caption*{Tudi to ne pomaga. Na levi imam še navadno potenco mešanega člena, za katerega sem že ugotovil, da pomaga. Na desni pa je tudi ta mešani člen v obliki produkta specialnih polinomov.}
+\end{figure}
+
+Moj končen optimalni model in njegovi parametri so torej:
+\begin{equation*}
+\theta_{tg} = a_0 + a_1 x_{fp} + ... + a_4 x_{fp}^4 + b_1 \theta_{fp} + ... + b_4 \theta_{fp}^4 + c x_{fp}\theta_{fp}
+\end{equation*}
+
+\begin{center}
+\begin{tabular}{|c|c|}
+\hline
+$\chi^2$ & 51.7 \\ \hline
+$a_0$ & 1.7 \\ \hline
+$a_1$ & 0.96 \\ \hline
+$a_2$ & -0.002 \\ \hline
+$a_3$ & $3*10^{-6}$ \\ \hline
+$a_4$ & $-4*10^{-9}$ \\ \hline
+$b_1$ & -0.8 \\ \hline
+$b_2$ & $-2.6*10^{-4}$ \\ \hline
+$b_3$ & $-3.5*10^{-7}$ \\ \hline
+$b_4$ & $-4.3*10^{-10}$ \\ \hline
+$c$ & 5 $0.0006$\\ \hline
+\end{tabular}
+\end{center}
+Veliko parametrov torej zgleda zelo majhnih. Zanimivo je videti, da je c pravzaprav zelo majhen, pa nam je uvedba mešanega člena vseeno krepko znižala hi kvadrat.
+
+
+Sedaj sem pomislil, da bom raje poskusil upoštevati več mešanih členov, čeprav ni kazalo, da bo kaj vplivano na fit, samo da vidim če morda vsi skupaj naredijo kako vidno razliko. 
+
+Spomnimo se najprej na model:
+\begin{equation*}
+\theta_{tg} = \theta_{tg}' + d_{21}(x_{fp}^2 \theta_{fp}) + d_{22} (x_{fp}^2 \theta_{fp})^2 + .. d_{2s}(x_{fp}^2 \theta_{fp})^s + d_{31}(x_{fp}^3 \theta_{fp}) + .. + d_{t1}(x_{fp}^t \theta_{fp})
+\end{equation*}
+
+Ko sem to prej gledal, so tiste najnižje potence malo prispevale in se nisem kaj več poglabljal, zdaj se bom:
+
+\begin{figure}[H]
+\begin{subfigure}{.49\textwidth}
+\includegraphics[width=\linewidth]{druga/poblize.pdf}
+\end{subfigure}
+\begin{subfigure}{.49\textwidth}
+\includegraphics[width=\linewidth]{druga/poblize2.pdf}
+\end{subfigure}
+\caption*{Za s večje od 2 nam spet zelo naraste. Pri t=3 pa pride v poštev samo s=1 v obeh primerih, ki nam da hi kvadrat na približno 49.5 Na desni je spet vloga iksa in thete zamenjana.}
+\end{figure}
+
+Za model bom vzel še nekaj kvocientnih funkcij, ki so hi kvadrat malce znižale prej:
+\begin{align*}
+&\theta_{tg} = a_0 + a_1 x_{fp} + ... + a_4 x_{fp}^4 + b_1 \theta_{fp} + ... b_4 \theta_{fp}^4 + c_1 x_{fp} \theta_{fp} + .. c_3 (x_{fp} \theta_{fp})^3 + d_1 (x_{fp}^2 \theta_{fp}) + d_2 (x_{fp}^2 \theta_{fp})^2\\
+&+ f_1 (x_{fp} \theta_{fp}^2) + f_2 (x_{fp} \theta_{fp}^2)^2 + g x_{fp}^3 \theta_{fp} + h x_{fp} \theta_{fp}^3 +i_1 (x_{fp}/\theta{fp})^1 + ... + i_3(x_{fp}/\theta_{fp})^3 \\
+\end{align*}
+\begin{center}
+\begin{tabular}{|c|c|c|c|}
+\hline
+$\chi^2$ & 42.55 &$c_2$ & $3.4*10^{-8}$\\ \hline
+$a_0$ & 1.7 &$c_3$ & $-2.8*10^{-12}$\\ \hline
+$a_1$ & 0.98 &$d_1$ & $6.5*10^{-6}$\\ \hline
+$a_2$ & -0.002 &$d_2$ & $3.8*10^{-12}$\\ \hline
+$a_3$ & $3.5*10^{-8}$ &$f_1$ & $199479$\\ \hline
+$a_4$ & $2.63*10^{-8}$ &$f_2$ & $-4.6*10^{-6}$\\ \hline
+$b_1$ & -0.85 &$g$ & $9.7*10^{-13}$\\ \hline
+$b_2$ & $-2.6*10^{-4}$ &$h$ & $-199479$\\ \hline
+$b_3$ & $7*10^{-7}$ &$i_1$ & $-0.11$\\ \hline
+$b_4$ & $-5.5*10^{-9}$ &$i_2$ & $-0.07$\\ \hline
+$c_1$ & 5 $0.0007$ &$i_3$ & 0.01\\ \hline
+\end{tabular}
+\end{center}
+
+Kaj pa če zdaj poskusimo potence(vključno pod ulomkovo črto) zamenjati s specialnimi polinomi? Tukaj je tabela vrednosti $\chi^2$:
+\begin{center}
+\begin{tabular}{|c|c|}
+\hline
+potence& 42.55 \\ \hline
+Čebišev& 40.54 \\ \hline
+Legendre& 40.56 \\ \hline
+Laguerre& divergira \\ \hline
+Hermite & divergira \\ \hline
+\end{tabular}
+\end{center}
+\newpage
+\section{Absorbcijski robovi}
+
+Dana imamo absorbcijska spektra kompleksov Cd sulfata z glutaionom in pektinom. V prvem je Cd vezan le na žveplo,
+v drugem pa na kisik. Želimo določiti odstotno razmerje teh dveh vezi v lističih rastline C. Thlaspi na krovni plasti in na sredini.
+
+Model bo preprosto linearen
+\begin{equation*}
+y = a y_1 + b y_2
+\end{equation*}
+Kjer sta $y_1$ in $y_2$ absorbcijska spektra, kjer so le vezi z žveplom oziroma kisikom.
+
+\begin{figure}[H]
+\begin{subfigure}{\textwidth}
+\includegraphics[width=\linewidth]{tretja/krovna.pdf}
+\end{subfigure}
+\caption*{Izmerki posameznih absorbcijskih spektrov.}
+\end{figure}
+
+\begin{figure}[H]
+\begin{subfigure}{\textwidth}
+\includegraphics[width=\linewidth]{tretja/krovna2.pdf}
+\end{subfigure}
+\caption*{Najboljši fit, če dam napako na 1. Ta napaka je prevelika, to se hitro vidi iz tega, da je hi kvadrat skoraj 0. Poleg tega so tudi variacije parametrov zelo velike torej o deležu vezi težko kaj rečemo. Korelacijski koeficient pa je skoraj 1, kar tudi ne zgleda preveč dobro.}
+\end{figure}
+
+\begin{figure}[H]
+\begin{subfigure}{\textwidth}
+\includegraphics[width=\linewidth]{tretja/krovna3.pdf}
+\end{subfigure}
+\caption*{Tokrat sem za napako vzel 0.05, kar poveča hi kvadrat in zmanjša variance, korelacijski koeficient pa je še  vedno skoraj 1 (čudno?). Sedaj lahko vsaj z več samozavesti trdimo, da je v krovni plasti lističa približno 27 odstotkov vezi z žveplom, 73 pa z kisikom.}
+\end{figure}
+
+\begin{figure}[H]
+\begin{subfigure}{\textwidth}
+\includegraphics[width=\linewidth]{tretja/sredica.pdf}
+\end{subfigure}
+\caption*{Še absorbcije za sredico lističa.}
+\end{figure}
+
+\begin{figure}[H]
+\begin{subfigure}{\textwidth}
+\includegraphics[width=\linewidth]{tretja/sredica2.pdf}
+\end{subfigure}
+\caption*{Tokrat sem kar takoj privzel napako 0.05 Parametri nam povejo, da je tukaj približno 55 odstotkov vezi z žveplom, 45 pa z kisikom.}
+\end{figure}
+
+
+\end{document}

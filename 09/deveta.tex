@@ -1,0 +1,177 @@
+\documentclass{article}
+
+\usepackage[utf8]{inputenc}
+\usepackage{amsmath}
+\usepackage{mathtools}
+\usepackage{graphicx}
+\usepackage{subcaption}
+\usepackage{caption}
+\usepackage{float}
+\usepackage{geometry}
+\usepackage{physics}
+\geometry{margin=1in}
+
+\title{Integracije z metodo Monte Carlo}
+\author{Andrej Kolar-Požun, 28172042}
+
+
+
+\errorcontextlines 10000
+\begin{document}
+\pagenumbering{gobble}
+\maketitle
+\newpage
+\pagenumbering{arabic}
+\section{Presek treh valjev}
+
+Naša prva naloga je določiti volumen preseka treh medsebojno pravokotnih valjev, katerih premer bom dal na 1.
+Koordinatni sistem si bom izbral tako, da je težišče preseka v koordinatnem izhodišču.
+Z numpyjevim random generatorjem bom zgeneriral N točk v 1x1x1 kocki, centrirani okoli izhodišča. Spremljal bom kakšen delež teh točk se nahaja znotraj vseh treh valjev(torej v preseku). Po velikem številu točk bi moral kvocient števila točk v preseku in števila vseh zgeneriranih točk bit enak kvocientu volumna preseka in volumna kocke(1).
+
+\begin{figure}[H]
+\centering
+\begin{subfigure}{.7\textwidth}
+\includegraphics[width=\linewidth]{prva/volumenkonst.pdf}
+\end{subfigure}
+\caption*{Delež števil je v tem primeru enak volumnu preseka. Ta pride okoli 0.586 Ne ozirajte se na znak $\rho=1$ v naslovu. Volumen je seveda od tega neodvisen.}
+\end{figure}
+
+Za homogeno gostoto enako ena bom izračunal še vztrajnostni moment telesa.
+\begin{equation*}
+I = \int(x^2 + y^2)dV
+\end{equation*}
+
+Takšne integrale, kjer integriramo nekonstantno funkcijo po preseku bom računal na naslednji način:
+Najprej zgeneriram N točk iz preseka, s tem da, kot prej generiram točke po kocki in jih vržem ven, če so zunaj preseka. Potem bom integral oblike $\int f dV$ računal kot $f \approx V  /N \sum_1^N f(x_i)$, kjer je V volumen preseka, ki sem ga že izračunal. 
+
+\begin{figure}[H]
+\centering
+\begin{subfigure}{.7\textwidth}
+\includegraphics[width=\linewidth]{prva/inertiakonst.pdf}
+\end{subfigure}
+\caption*{Izračun vztrjanostnega momenta pri konstanti gostoti ena. Pri N=100000 pride ta $0.06$}
+\end{figure}
+
+Še nekaj o napaki Monte Carlo metode: Napaka je kar $\frac{V}{\sqrt{N}} \sqrt{<f^2> - <f>^2}$. Za zgornji primer vztrajnostnega momenta pride ta pri N=100000 $8*10^{-6}$, kjer sem za V vzel, da je 0.586 točna vrednost(Kar ni čisto res, a dobimo dovolj dober približek za napako).
+
+Poglejmo še, kako se volumen in vztrajnostni moment spreminjata, če gostota ni konstantna ampak se spreminja kot
+\begin{equation*}
+\rho = (r/r_0)^p
+\end{equation*}
+Kjer je $r_0$ enak polmeru preseku očrtanem krogu, torej $\sqrt{3/2}*0.5$
+
+\begin{figure}[H]
+\centering
+\begin{subfigure}{.49\textwidth}
+\includegraphics[width=\linewidth]{prva/volumenp.pdf}
+\end{subfigure}
+\begin{subfigure}{.49\textwidth}
+\includegraphics[width=\linewidth]{prva/inertiap.pdf}
+\end{subfigure}
+\caption*{V obeh primerih sem generiral 10000 točk v preseku. Vidimo, da napaka z naraščujočim p narašča, volumen/vztrajnostni moment pa padata. Zanimivi so večji skoki pri celih številih p.}
+\end{figure}
+
+\section{Žarki gama}
+
+Naša naslednja naloga obravnava žarke gama, ki se rojevajo v krogli. Njihova povprečna pot je enaka radiju krogle, katerega bom postavil na ena. Zanima nas, kolikšen delež fotonov uide iz krogle.
+Za opis poti fotona iz krogle potrebujemo zaradi simetrije le dva parametra: razdalja od izhodišča r, ki bo označevala mesto nastanka gama žarka in azimutalni kot $\theta$, pod katerim bo foton ušel.
+Porazdelitev, ki nam bo dala enakomerno porazdeljenost po prostornem kotu že poznamo in je $cos(\theta) = 2u - 1$, porazdelitev po radiju pa na hitro izpeljimo:
+\begin{align*}
+&dP/dr = A r^2 \\
+& 1 = A/3 , A = 3 \\
+&F(r) = r^3 \\
+&r = u^{1/3}
+\end{align*}
+Verjetnostna porazdelitev absorbcije fotona v snovi je $dP/dx = \frac{1}{\mu} e^{-x/\mu}$, kjer je $\mu$ povprečna prosta pot. Izpeljimo še naš generator po tej porazdelitvi:
+\begin{align*}
+&F(x) = (- e^{-x/\mu} + 1) \\
+&F(x) - 1 = - e^{-x/\mu} \\
+&x = -\mu ln(1-u)
+\end{align*}
+
+Z uporabo kosinusnega izreka hitro vidimo, da mora nastali žarek na razdalji r, ki gre v smeri $\theta$ prepotovati razdaljo $l = -r cos\theta + \sqrt{r^2 cos^2\theta + R^2-r^2}
+$, da pride iz krogle. Če je ta razdalja večja od razdalje, dobljene po naši eksponentni porazdelitvi, je foton uspel uiti.
+
+\begin{figure}[H]
+\centering
+\begin{subfigure}{.49\textwidth}
+\includegraphics[width=\linewidth]{druga/delezi.pdf}
+\end{subfigure}
+\begin{subfigure}{.49\textwidth}
+\includegraphics[width=\linewidth]{druga/delezi2.pdf}
+\end{subfigure}
+\caption*{Na levi je verjetnost pobega, ki je okoli 0.53, na desni pa je ta verjetnost prikazana v odvisnosti od povprečne proste poti $\mu$ pri čemer je radij krogle še vedno 1. Delež(ki je tudi verjetnost za pobeg fotona) seveda z naraščanjem povprečne proste poti narašča.}
+\end{figure}
+
+\section{Nevtronski reflektor}
+
+Imamo tok nevtronov, ki vpadajo pravokotno na ploščo debeline d. V plošči se nevtroni lahko sipljejo naprej ali pa nazaj, pri čemer so verjetnosti
+za obe smeri enake. Njihova prosta pot je enaka $d/2$. Debelino d bom postavil kar na ena.
+Naš generator verjetnostne porazdelitve za sipanje je podobno kot prej:
+\begin{equation*}
+\Delta = -1/2 ln(1-u)
+\end{equation*}
+Na začetku se nahajamo v točki x=0 in po prvem sipanju pristanemo pri $x=\Delta_0$.  Nato se z verjetnostjo 1/2 odločimo v katero smer bomo šli in se v naslednjem koraku nahajamo pri $x=\Delta_0 \pm \Delta_1$ in tako naprej dokler ne pridemo spet na $x=0$ ali $x=1$, kar pomeni, da smo prišli iz plošče.
+
+\begin{figure}[H]
+\centering
+\begin{subfigure}{.49\textwidth}
+\includegraphics[width=\linewidth]{tretja/sipanja2.pdf}
+\end{subfigure}
+\begin{subfigure}{.49\textwidth}
+\includegraphics[width=\linewidth]{tretja/sipanja.pdf}
+\end{subfigure}
+\caption*{Porazdelitev števila sipanj. Na levi sem vzel 25 enakomerno porazdeljenih binov. Na desni sem število binov povečal na 100 na intervalu med 1 in 10, od 10 do 25 pa sem obdržal 10 binov. Pri gostejši izbiri binov opazimo, da imamo vmes luknje, ki ustrezajo necelim številom sipanj. }
+\end{figure}
+
+\begin{figure}[H]
+\centering
+\begin{subfigure}{.7\textwidth}
+\includegraphics[width=\linewidth]{tretja/prepustnost.pdf}
+\end{subfigure}
+\caption*{delež prepuščenih nevtronov v odvisnosti od števila poslanih nevtronov. Napako sem ocenil tako, da sem večkrat poslal isto število nevtronov in izračunal varianco. Tako sem za 200 kratno pošiljanje 10000 nevtronov dobil $T=0.499 \pm 0.005$}
+\end{figure}
+
+Vajo bom ponovil za model izotropnega sipanja. Torej se nevtroni ne sipljejo le levo pa desno, ampak je porazdelitev kot prej enakomerno porazdeljena po prostorskem kotu. To bom modeliral kot prej, le da bom pri vsakem sipanju še enakomerno generiral $cos\theta$, kar pomeni, da lahko nevtron zleti pod nekim kotom. V principu bi moral spremljati še porazdelitev po kotu fi, a ker je plošča neskončna si lahko preprosto izberem os z v smeri normalno na ploščo in spremljam azimutalni kot smeri $\theta$ ter pri vsakem koraku namesto, da bi se z polovično verjetnostjo odločil za posamozno smer, moji lokaciji na z osi preprosto prištejem prepotovano pot pomnoženo z kosinusom.
+
+\begin{figure}[H]
+\centering
+\begin{subfigure}{.49\textwidth}
+\includegraphics[width=\linewidth]{tretja/steviloizo.pdf}
+\end{subfigure}
+\begin{subfigure}{.49\textwidth}
+\includegraphics[width=\linewidth]{tretja/steviloizo2.pdf}
+\end{subfigure}
+\caption*{Podobna oblika kot prej le pričakovano večje maksimalno število sipanj. Na desni sem za lepši prikaz oblike spet izbral več binov, čeprav nam ti dajo luknje. Tukaj lahko odgovorim še na vprašanje, kako so rezultati poenostavljenega modela uporabni. Uporabni so lahko za iskanje napak, saj vemo, da bi moral izotropen primer dati povprečno manjše število sipanj kot poenost
+avljen. Če grafi tega ne bi kazali, bi tako vedeli, da je nekje napaka.}
+\end{figure}
+
+\begin{figure}[H]
+\centering
+\begin{subfigure}{.7\textwidth}
+\includegraphics[width=\linewidth]{tretja/izoprepustnost.pdf}
+\end{subfigure}
+\caption*{Odvisnost prepustnosti od N še za izotropen primer. Tokrat dobim $T=0.482 \pm 0.005$, torej nekoliko manj kot pri omejenem sipanju.}
+\end{figure}
+
+\begin{figure}[H]
+\centering
+\begin{subfigure}{.49\textwidth}
+\includegraphics[width=\linewidth]{tretja/debelina.pdf}
+\end{subfigure}
+\begin{subfigure}{.49\textwidth}
+\includegraphics[width=\linewidth]{tretja/debelina2.pdf}
+\end{subfigure}
+\caption*{Povprečna prosta pot je tukaj fiksna in je 0.5, seveda imamo potem za d<1 prepustnost veliko, za d>1 pa se ta manjša.}
+\end{figure}
+
+\begin{figure}[H]
+\centering
+\begin{subfigure}{.7\textwidth}
+\includegraphics[width=\linewidth]{tretja/kotna.pdf}
+\end{subfigure}
+\caption*{Kotna porazdelitev. Pričakovano jih je največ blizu 0 in pi, najmanj pa v bližini pi/2. Drugi vrh je večji kar ustreza temu, da je prepustnost malce pod polovico.}
+\end{figure}
+
+
+\end{document}

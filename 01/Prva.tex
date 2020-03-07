@@ -1,0 +1,220 @@
+\documentclass{article}
+
+\title{Model vo{\v z}nje skozi semafor: variacijska metoda}
+\author{Andrej Kolar-Po{\v z}un}
+
+\usepackage[utf8]{inputenc}
+\usepackage{amsmath}
+\usepackage{graphicx}
+\usepackage{subcaption}
+\usepackage{caption}
+\usepackage{float}
+\usepackage{physics}
+
+\errorcontextlines 10000
+\begin{document}
+\pagenumbering{gobble}
+\maketitle
+\newpage
+\pagenumbering{arabic}
+
+\section{Naloga}
+Iščemo optimalen način varčne vožnje za prevoz semaforja, ki je oddaljen za $l_0$, če se zelena luč prižge ob času $t_0$. Štartamo ob času $t=0$ z začetno hitrostjo $v_0$.
+
+Varčno vožnjo matematično zapišemo z minimizacijo funkcionala 
+\\
+$\int_0^{t_0} \dot{v}^2 dt = min$ z vezjo $\int_0^{t_0} v dt = l_0$ 
+
+Formulacijo polepšamo če jo spremenimo v brezdimenzijsko obliko. Uvedemo nove spremenljivke $\tilde{t}=t/t_0, \tilde{v}=v/v_0, c=\frac{t_0 v_0}{l_0}$. Recimo še, da je $\dot{\tilde{v}} = \frac{d\tilde{v}}{d\tilde{t}}$:
+\begin{align*}
+&\int_0^1 \dot{\tilde{v}}^2 d\tilde{t} =  min \\
+&c \int_0^1 \tilde{v} d\tilde{t} = 1 \\
+&\tilde{v}(\tilde{t}=0) = 1 \\
+\end{align*}
+
+Od tu naprej bom tilde nad spremenljivkami zaradi preprostosti spet spuščal: Zapomnili si bomo, da so to zgoraj definirane brezdimenzijske spremenljivke. Izhodišče koordinatnega sistema si bom izbral, da bo veljalo $x(0)=0$.
+
+\section{Reševanje}
+\subsection{Poljubna končna hitrost}
+Optimalni vožnji pri pobljuni hitrosti $v(1)$ ustreza robni pogoj $\frac{\partial{L}}{\partial{\dot{v}}}(t=1) = 0$, kjer je 
+$L= \dot{v}^2 - c \lambda v$. Funkcijo $v(t)$ dobimo, če pri danih pogojih rešimo E-L enačbo:
+
+\begin{align*}
+&\frac{d}{dt}\Big(\frac{\partial{L}}{\partial{\dot{v}}}\Big) - \frac{\partial{L}}{\partial{v}} = 0 \\
+&2\ddot{v} +  c \lambda = 0 \\
+&v(t) = -\frac{c \lambda}{4} t^2 + At + b \\
+&v(t) = \frac{3(c-1)}{2c} t^2 - \frac{3(c-1)}{c}t + 1 \\ 
+&a(t) = \frac{3(c-1)}{c}t - \frac{3(c-1)}{c} \\
+&x(t) =\frac{(c-1)}{2c} t^3 - \frac{3(c-1)}{2c}t^2 + t
+\end{align*}
+
+Opazka: Prosti robni pogoj pri $t=1$ ustreza pogoju $\dot{v}=0$. Dobimo torej rešitev, kjer je končna hitrost ekstremalna.
+\begin{figure}[H]
+\centering
+\begin{subfigure}{.5\textwidth}
+\includegraphics[width=\linewidth]{1vecc.pdf}
+\end{subfigure}
+\caption*{Nekaj primerov optimalne porazdelitve hitrosti.}
+\end{figure}
+\begin{figure}[H]
+\begin{subfigure}{.5\textwidth}
+\includegraphics[width=\linewidth]{2vecc.pdf}
+\end{subfigure}
+\begin{subfigure}{.5\textwidth}
+\includegraphics[width=\linewidth]{3vecc.pdf}
+\end{subfigure}
+\caption*{Za iste parametre še funkciji x(t) in a(t).}
+\end{figure}
+
+Parameter c nam primerja $v_0 t_0$ z $l_0$. Po pričakovanju je pri vrednosti $c=1$ rešitev vožnja s konstantno hitrostjo. Pri $c>3$ imamo prisotno negativno hitrost, torej smo prevozili semafor(čez rdečo) in se vzvratno vrnili k njemu. Saj naša vez zahteva le, da se po času $t=1$ nahajamo pri $l_0$, nimamo pa pogoja, ki bi zahteval nenegativno hitrost.
+\subsection{Izbrana končna hitrost}
+Recimo, da želimo zdaj semafor prevoziti pri določeni hitrosti. Robni pogoj v našem problemu se zdaj glasi $v(1)=v_k$ za neko končno hitrost $v_k$. Rešitev pri tem pogoju je:
+\begin{align*}
+&v(t) = \frac{3(c(v_k + 1)-2) }{c} t^2 + (6/c -2(v_k+2))t + 1 \\
+&a(t) = \frac{6(c(v_k + 1)-2) }{c} t + 6/c -2(v_k+2) \\
+&x(t) = \frac{(c(v_k + 1)-2) }{c} t^3 + (3/c -(v_k+2))t^2 + t \\
+\end{align*}
+
+\begin{figure}[H]
+\centering
+\begin{subfigure}{.5\textwidth}
+\includegraphics[width=\linewidth]{1vecvk.pdf}
+\end{subfigure}
+\end{figure}
+\begin{figure}[H]
+\begin{subfigure}{.5\textwidth}
+\includegraphics[width=\linewidth]{2vecvk.pdf}
+\end{subfigure}
+\begin{subfigure}{.5\textwidth}
+\includegraphics[width=\linewidth]{3vecvk.pdf}
+\end{subfigure}
+\caption*{Optimalni načini vožnje pri fiksnem c za več končnih hitrosti.}
+\end{figure}
+Zanimivo je, da imajo vsi zgornji primeri ob nekem času enako hitrost. To je lastnost naše funkcije $v(t)$. Vidimo, da če vstavimo $t=2/3$ se členi z $v_k$ izničijo in dobimo hitrost neodvisno od tega parametra. Podobno se zgodi pri pospešku.
+Pri previsoki začetni hitrosti za fiksen c imamo spet prisotno negativno hitrost.
+
+\begin{figure}[H]
+\centering
+\begin{subfigure}{.5\textwidth}
+\includegraphics[width=\linewidth]{1checkvk.pdf}
+\end{subfigure}
+\caption*{Primerjava funkcije, ki jo da pogoj ekstremne hitrosti pri $x=l_0$ in funkcije pri kateri ročno nastavimo končno hitrost na maksimalno vrednost.}
+\end{figure}
+
+Če bi nam formuli dali različni krivulji, bi vsaj ena izmed njiju bila napačna.
+
+\subsection{Drugačna potenca v funkcionalu}
+Poglejmo kakšni so naši načini vožnje če minimiziramo naslednji funkcional:
+Za začetek se omejimo na sode potence, pri katerih je reševanje preprostejše.
+\begin{align*}
+&\int_0^1 \dot{v}^{2p} dt= min \\
+&2p(2p-1)\dot{v}^{2p-2}\ddot{v} + c \lambda = 0 \\
+&v(t) = -\alpha (-\beta t+ \gamma )^{2p/(2p-1)} + \delta
+\end{align*}
+Kjer sem z grškimi črkami označil količine, ki niso odvisne od časa.
+
+\begin{figure}[H]
+\centering
+\begin{subfigure}{.5\textwidth}
+\includegraphics[width=\linewidth]{1vecp.pdf}
+\end{subfigure}
+\caption*{Ko p povečujemo, postaja funkcija vedno bolj podobna premici.} 
+\end{figure}
+\begin{figure}[H]
+\begin{subfigure}{.5\textwidth}
+\includegraphics[width=\linewidth]{2vecp.pdf}
+\end{subfigure}
+\begin{subfigure}{.5\textwidth}
+\includegraphics[width=\linewidth]{3vecp.pdf}
+\end{subfigure}
+\caption*{Formulo sem uporabil tudi za lihe p in vidim, da je $\dot{v}$ vedno pozitiven, torej je to, da nisem upošteval, da bi morala biti v funkcionalu še absolutna vrednost v redu.}
+\end{figure}
+
+\subsection{Dodaten člen v funkcionalu}
+Kaj pa če hočemo poleg pospeška minimizirati tudi hitrost? Temu bi ustrezal takšen funkcional:
+\begin{equation*}
+\int_0^1 \dot{v}^2 + K v^2 dt = min
+\end{equation*}
+V funkcional sem dodal še en prosti parameter K, ki nam določa kako pomembno nam je minimiziranje hitrosti napram minimiziranju pospeška. Rečemo še, da ima K takšne enote, da problem ostane brezdimenzijski. Rešimo:
+\begin{align*}
+&2 \ddot{v} + c\lambda - 2Kv = 0 \\
+&v(t) = \frac{c \lambda}{2K} + A exp(\sqrt{K}t)+Bexp(-\sqrt{K}t)
+\end{align*}
+\begin{figure}[H]
+\begin{subfigure}{.5\textwidth}
+\includegraphics[width=\linewidth]{1veck.pdf}
+\end{subfigure}
+\begin{subfigure}{.5\textwidth}
+\includegraphics[width=\linewidth]{2veck.pdf}
+\end{subfigure}
+\caption*{Za višje K postaja v(t) podoben škatlasti funkciji. $ K \equiv 0$ prikazuje funkcional brez drugega člena}
+\end{figure}
+
+\begin{figure}[H]
+\begin{subfigure}{.5\textwidth}
+\includegraphics[width=\linewidth]{3veck.pdf}
+\end{subfigure}
+\begin{subfigure}{.5\textwidth}
+\includegraphics[width=\linewidth]{4veck.pdf}
+\end{subfigure}
+\caption*{Kot zanimivost pogledam še negativne K. Tukaj bi za minimizacijo funkcionala bila bolj ugodna višja hitrost.}
+\end{figure}
+
+\begin{figure}[H]
+\centering
+\begin{subfigure}{.5\textwidth}
+\includegraphics[width=\linewidth]{5veck.pdf}
+\end{subfigure}
+\caption*{Trajektorije za pozitivne K so si veliko bolj podobne kot za negativne.}
+\end{figure}
+
+\subsection{Periodični robni pogoj}
+Spomnimo se rešitve za izbrano končno hitrost iz prve naloge in uporabimo periodični robni pogoj:
+\begin{align*}
+&v(t) = -\frac{c \lambda}{4} t^2 + At + b \\
+&v(0)=v(1) = 1 \\
+&v(t) = -8(1/c - v(0)) t^2 + 8(1/c-v(0))t + v(0)
+\end{align*}
+
+\begin{figure}[H]
+\centering
+\begin{subfigure}{.5\textwidth}
+\includegraphics[width=\linewidth]{1per.pdf}
+\end{subfigure}
+\end{figure}
+
+\begin{figure}[H]
+\begin{subfigure}{.5\textwidth}
+\includegraphics[width=\linewidth]{2per.pdf}
+\end{subfigure}
+\begin{subfigure}{.5\textwidth}
+\includegraphics[width=\linewidth]{3per.pdf}
+\end{subfigure}
+\caption*{Mimogrede opazimo še, da je pospešek zvezen, ko je 0, kar seveda ustreza enakomernemu gibanju.}
+\end{figure}
+
+To lahko vidimo tudi iz enačb, če nastavimo robna pogoja(poleg vezi) $v(0) = v(1)$ in $\dot{v}(0) = \dot{v}(1)$.
+
+
+Poskusimo rešiti še primer, ko imamo dva semaforja. Prvi se na razdalji $x=l_0$ prižge ob $t=1$, drugi pa na $x=3l_0$ ob $t=2$. Kakšna je zdaj optimalna vožnja?
+\begin{align*}
+&\int_0^2 \dot{v}^2(t) dt = min \\
+&\int_0^1 v(t) dt = 1/c = \int_0^2 v(t) (1-\Theta(t-1))dt\\
+&\int_1^2 v(t) dt = 2/c = \int_0^2 v(t) \Theta(t-1) dt
+\end{align*}
+S $\Theta$ sem označil step funkcijo, ki mi omogoča prevedbo vezi na integral od 0 do 2.
+\begin{align*}
+&L = \dot{v}^2 - \lambda v(t)(1-\Theta(t-1)) - \mu v(t)\Theta(t-1) \\
+&2\ddot{v} + \lambda (1-\Theta(t-1)) + \mu \Theta(t-1) = 0
+\end{align*}
+Enačbo rešim tako, da posebej obravnavam dela pred in po $t=1$ in zahtevam, da sta  $v(t)$ in $\dot{v}(t)$ zvezna pri $t=1$.
+
+\begin{figure}[H]
+\centering
+\begin{subfigure}{.5\textwidth}
+\includegraphics[width=\linewidth]{bonus.pdf}
+\end{subfigure}
+\end{figure}
+
+\end{document}
+

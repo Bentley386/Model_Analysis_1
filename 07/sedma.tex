@@ -1,0 +1,250 @@
+\documentclass{article}
+
+\usepackage[utf8]{inputenc}
+\usepackage{amsmath}
+\usepackage{mathtools}
+\usepackage{graphicx}
+\usepackage{subcaption}
+\usepackage{caption}
+\usepackage{float}
+\usepackage{geometry}
+\usepackage{physics}
+\geometry{margin=1in}
+
+\title{Razdelčni in nelinearni modeli}
+\author{Andrej Kolar-Požun, 28172042}
+
+
+
+\errorcontextlines 10000
+\begin{document}
+\pagenumbering{gobble}
+\maketitle
+\newpage
+\pagenumbering{arabic}
+\section{Farmakološki model}
+Model iz prejšnje naloge razširimo z vpeljavo parametra p, kar nam povzorči nelinearnost. Za vse prihajajoče nelinerane probleme bom uporabljal Levenberg-Marquardtovo metodo, ki je v pythonovi knjižnici scipy.
+\begin{equation*}
+y = \frac{y_0 x^p}{x^p + a^p}
+\end{equation*}
+
+Najprej bom obravnaval primer p=1 in ga poskusil rešiti z nelinearno metodo, saj smo prejšnjič videli, da nam je obrat $1/x \rightarrow x$ povečal hi kvadrat:
+
+\begin{figure}[H]
+\begin{subfigure}{.49\textwidth}
+\includegraphics[width=\linewidth]{prva/anal.pdf}
+\end{subfigure}
+\begin{subfigure}{.49\textwidth}
+\includegraphics[width=\linewidth]{prva/p1.pdf}
+\end{subfigure}
+\caption*{Na levi je graf od prejšnje naloge, na desni ista naloga rešena z lm metodo.. Nelinearen fit nam da nižji hi kvadrat in je bil tudi zelo neodvisen od izbire začetnih pogojev. Na grafu zapisana $\chi^2$ sta nereducirana.}
+\end{figure}
+\begin{center}
+\begin{tabular}{|c|c|c|}
+\hline
+& Linearna & Nelinearna \\ \hline
+$\chi^2$ & 26.08 & 22.01 \\ \hline
+$\chi^2_{red}$ & 4.3 & 3.7 \\ \hline
+$y_0$ & 104.7&$ 106.3$ \\ \hline
+$a$ & 21.2 &$24.8$ \\ \hline
+\end{tabular}
+\end{center}
+
+Od tu naprej bom s $\chi^2$ označeval kar reduciranega(torej deljenega z N-M)
+Poglejmo si, kaj nam prinese uvedba parametra p:
+
+\begin{figure}[H]
+\begin{subfigure}{\textwidth}
+\includegraphics[width=\linewidth]{prva/p.pdf}
+\end{subfigure}
+\caption*{$\chi^2$ se je krepko znižal. Fit je tudi vidno dober, očitno je to boljši model. Poleg tega metoda tudi za varianco parametrov tokrat da manjše številke kot prej.}
+\end{figure}
+
+Prejšnji rezultat bi rad primerjal še z sledečima modelomal
+\begin{align*}
+&y_1 = \frac{y_0 x^p}{x^p + a} \\
+&y_2 = \frac{y_0 x^{p_1}}{x^{p_2}+a}
+\end{align*}
+z y pa bom označil doslej najboljši model $y=y_0 x^p/(x^p + a^p)$
+
+\begin{figure}[H]
+\begin{subfigure}{.49\textwidth}
+\includegraphics[width=\linewidth]{prva/p2.pdf}
+\end{subfigure}
+\begin{subfigure}{.49\textwidth}
+\includegraphics[width=\linewidth]{prva/p3.pdf}
+\end{subfigure}
+\caption*{Zanimivo se mi je zdela pogledati še ta model, kjer sem konstanto $a^p$ le zamenjal z drugo konstanto $a$. Po pričakovanjih so vrednosti hi kvadrat ter konstant p in $y_0$ enake, zanimivo pa je, da v tem primeru metoda vrže zelo veliko varianco parametra a. Za graf na desni, kjer sem imel različno potenco pri iksu v imenovalcu in števcu se vidi, da je model slabši.}
+\end{figure}
+\begin{figure}[H]
+\centering
+\begin{subfigure}{.49\textwidth}
+\includegraphics[width=\linewidth]{prva/razlike.pdf}
+\end{subfigure}
+\caption*{Še razlike med izmerki in modelom. Uvedba konstante p je statistično upravičena, če poleg tega, da zniža $\chi^2$ tudi ohranja naključno raztresenost razlik okoli ničle, kar v tem primeru nekako zgleda, da je res, čeprav je pri tako malo točkah težko kaj videti.}
+\end{figure}
+
+\newpage 
+\section{Čistilnost ledvic}
+Zanima nas čistilnost ledvic $\lambda$, ki je definirana na naslednji način:
+\begin{align*}
+&\frac{dm}{V} = dc = \lambda c dt \\
+&c(t) = c_0 e^{-\lambda t}
+\end{align*}
+
+Zanimajo nas parametri $c_0$ in $\lambda$. Rešitev lahko tudi lineariziramo
+\begin{equation*}
+ln(c(t)) = ln(c_0) - \lambda t
+\end{equation*}
+
+\begin{figure}[H]
+\centering
+\begin{subfigure}{.49\textwidth}
+\includegraphics[width=\linewidth]{druga/brezkonst.pdf}
+\end{subfigure}
+\caption*{Noben fit ne izgleda dober. Fit, katerega je producirala lm metoda je bil neodvisen od začetnega približka za $c_0$, če pa za začetni približek za $\lambda$ dam več kot približno 0.2 metoda slabo deluje, kot se vidi tudi na sliki pri $\lambda=1$. Razen tega ni bilo videti nobene razlike v izbiri začetnih približkov.}
+\end{figure}
+
+Model lahko morda izboljšamo z uvedbo še enega parametra, ki ga prištejemo in predstavlja na primer sevanje ozadja, ki ni povezano z ledvicami:
+\begin{equation*}
+c(t) = c_0 e^{-\lambda t} + A
+\end{equation*}
+
+\begin{figure}[H]
+\centering
+\begin{subfigure}{.49\textwidth}
+\includegraphics[width=\linewidth]{druga/zkonst.pdf}
+\end{subfigure}
+\begin{subfigure}{.49\textwidth}
+\includegraphics[width=\linewidth]{druga/zkonstrazlike.pdf}
+\end{subfigure}
+\caption*{Na levi se vidi, da aditivna konstanta izboljša fit(čeprav je še vedno slab), na desni pa vidimo, da izboljša raztresenost razlik okoli 0.}
+\end{figure}
+
+Primerjajmo še parametre in $\chi^2$, katere da vsak izmed teh modelov:
+\begin{center}
+\begin{tabular}{|c|c|c|c|}
+\hline
+& LM & SVD & LM z ozadjem\\ \hline
+$\chi^2$ & $10^{6}$ & $1.7*10^6$ & $120895$\\ \hline
+$c_0$ & 10507& $8165.2$ & 10324\\ \hline
+$\lambda$ & $1.04*10^{-3}$ &$6.995*10^{-4}$ & $2.9*10^{-3}$\\ \hline
+$A$ & / & / & 2613\\ \hline
+\end{tabular}
+\end{center}
+
+Nižji reduciran $\chi^2$ in boljša raztresenost podatkov okoli ničle pomenita, da je očitno aditivna konstanta v tem primeru  statistično upravičena.
+
+Naslednja izboljšava je dvorazdelčni model. Recimo, da lahko hipuran iz ledvic pobegne tudi z difuzijo in se tako znajde v drugem delu telesa. Iz tega drugega dela lahko seveda tudi pride nazaj v ledvice.
+
+To lahko modeliramo z rešitvijo sistema dveh diferencialnih enačb: 
+\begin{align*}
+&\dot{c_1} = -\lambda c_1 - K(c_1 - c_2) \\
+&\dot{c_2} = k(c_1-c_2) \\
+&c(t) = A e^{-\lambda_1 t} + B e^{-\lambda_2 t}
+\end{align*}
+
+\begin{figure}[H]
+\centering
+\begin{subfigure}{.8\textwidth}
+\includegraphics[width=\linewidth]{druga/dvo.pdf}
+\end{subfigure}
+\caption*{Spet dobimo za obe visoki začetni lambdi zelo narobe, če pa je le ena visoka, je funkcija nekako zlomljena(oranžni graf). Ni pa točno vidno, če je upoštevanje ozadja boljše ali ne.}
+\end{figure}
+
+Bolj komplicirani modeli predvidijo naslednjo zvezo, katero bom tudi preiskal:
+\begin{equation*}
+c(t) = A e^{-\lambda_1 \sqrt{t}} + B e^{-\lambda_2 \sqrt{t}}
+\end{equation*}
+
+\begin{figure}[H]
+\centering
+\begin{subfigure}{.8\textwidth}
+\includegraphics[width=\linewidth]{druga/koren.pdf}
+\end{subfigure}
+\caption*{Spet z prevelikimi začetnimi približki za obe lamdi čisto narobe pride, tokrat pa z le eno večjo začetno lambdo dobimo pravilnejši rezultat.}
+\end{figure}
+
+\begin{figure}[H]
+\centering
+\begin{subfigure}{.8\textwidth}
+\includegraphics[width=\linewidth]{druga/razlike.pdf}
+\end{subfigure}
+\caption*{Grafi, pri katerih ne piše, da gre za korenski čas ustrezajo modelu z dvema eksponentoma, kjer je v eksponentu čas na prvo potenco. Korenska časa z aditivno konstanto in lambdama 0.1,3 imata na začetku kar veliko razliko med izmerki in modelom. To ni dobro. Linearni čas z lambdama 0.1 pa je veliko bolj negativen kot je pozitiven. Nekako najbolje izgledata linearen čas z aditivno konstanto ter korenski čas z lambdama 0.1. Pa še: z aditivno konstanto sem vedno gledal pri obeh začetnih lambdah 0.1}
+\end{figure}
+
+Zdaj bom modele v zgornji sliki, kot si sledijo v legendo od zgoraj navzdol označil z $c_1(t), c_2(t), c_3(t), c_4(t), c_5(t)$
+
+\begin{center}
+\begin{tabular}{|c|c|c|c|c|c|}
+\hline
+& $c_1$ & $c_2$ & $c_3$ & $c_4$&  $c_5$\\ \hline
+$\chi^2$ & $55960$ & $66956$ & $71495$ & 18455 & 9050\\ \hline
+$A$ & 0.25& $14566$ & 6860& 8033 & 5445\\ \hline
+$B$ & $14196$ &$-0.08$ & $6860$& 5546 & 6294 \\ \hline
+$\lambda_1$ & -0.16 & 0.04 & 0.046& 0.005 & 0.008\\ \hline
+$\lambda_2$ & 0.04 & 3 & 0.047& $4.5*10^{-4}$ & 0.001\\ \hline
+$C$ & / & / & 469& / & 1988\\ \hline
+\end{tabular}
+\end{center}
+
+Pri gledanju zgornje tabele moramo imeti v mislih, da para konstant $A,\lambda_1$ in $B,\lambda_2$ nastopata v isti obliki. Tako lahko na primer $c_1$ in $c_2$ boljše primerjamo če pri enem izmed njiju ta para zamenjamo. Vidimo, da imata oba modela približno ista predfaktor in karakteristični čas pri enem členu a drugačen pri drugem.
+
+\begin{figure}[H]
+\centering
+\begin{subfigure}{.8\textwidth}
+\includegraphics[width=\linewidth]{druga/amb12.pdf}
+\end{subfigure}
+\caption*{Še ena opazka: model z začetnima lambdama, ki sta oba 0.1 brez aditivne konstante začne enkrat spet naraščati, kar ni pričakovano. Torej sta ostala modela na sliki boljša.}
+\end{figure}
+\newpage
+\section{Korozija}
+
+Zdaj nas bodo zanimali parametri korozije. Te lahko določimo iz U-I diagrama med kovino in korozivnim elektrolitom. model za to je:
+\begin{equation*}
+I = I_0( e^{U/U_a} - e^{-U/U_c})
+\end{equation*}
+
+Meritve napetosti so točne, za tok bom vzel napako 0.0001.
+Preiskal bom tudi izboljšan model, ki ublaži vpliv tega, da meritve ne gredo točno skozi izhodišče:
+\begin{equation*}
+I = I_0( e^{(U-U_0)/U_a} - e^{-(U-U_0)/U_c})
+\end{equation*}
+
+\begin{figure}[H]
+\centering
+\begin{subfigure}{.8\textwidth}
+\includegraphics[width=\linewidth]{tretja/fuck.pdf}
+\end{subfigure}
+\caption*{Dokaj očitno je, da za te začetne pogoje metoda ne da dobrega fita. Dober fit dobim če za začetni pogoj vzamem za $U_a$ in $U_c$ 100}
+\end{figure}
+
+\begin{figure}[H]
+\centering
+\begin{subfigure}{.8\textwidth}
+\includegraphics[width=\linewidth]{tretja/resitev.pdf}
+\end{subfigure}
+\caption*{Kot sem rekel, fit je dober, če vzamem za začetne vrednosti parametrov v eksponentu 100.}
+\end{figure}
+
+\begin{figure}[H]
+\centering
+\begin{subfigure}{.8\textwidth}
+\includegraphics[width=\linewidth]{tretja/razlike.pdf}
+\end{subfigure}
+\caption*{Razlike so velikostnega reda merskih napak in nekako porazdeljene okoli ničle}
+\end{figure}
+
+\begin{center}
+\begin{tabular}{|c|c|c|}
+\hline
+& Brez $U_0$ & S $U_0$\\ \hline
+$\chi^2$ & $4.08$ & $0.68$ \\ \hline
+$I_0$ & $2.6*10^{-3}$& $3.15*10^{-3}$\\ \hline
+$U_a$ & $139$ &$198$\\ \hline
+$U_c$ & 74 & 77 \\ \hline
+$U_0$ & / & -4.6 \\ \hline
+\end{tabular}
+\end{center}
+
+\end{document}

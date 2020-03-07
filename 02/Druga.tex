@@ -1,0 +1,132 @@
+\documentclass{article}
+
+\usepackage[utf8]{inputenc}
+\usepackage{amsmath}
+\usepackage{graphicx}
+\usepackage{subcaption}
+\usepackage{caption}
+\usepackage{float}
+\usepackage{physics}
+
+\title{Linearno programiranje}
+\author{Andrej Kolar-Požun, 28172042}
+
+
+
+\errorcontextlines 10000
+\begin{document}
+\pagenumbering{gobble}
+\maketitle
+\newpage
+\pagenumbering{arabic}
+
+\section{Naloga}
+Na podlagi dane tabele hranilnih vrednosti različnih živil bom z linearnim programiranem maksimiziral vnos kalorij pri določenih omejitvah.
+
+Najprej omejimo naš vnos na minimalno 70g maščob, 310g ogljikovih hidratov, 50g proteinov, 
+1000 mg kalcija, 18 mg železa ter maksimalno 2 kilograma skupnega obroka. 
+\begin{figure}[H]
+\begin{subfigure}{.5\textwidth}
+\includegraphics[width=\linewidth]{1.pdf}
+\end{subfigure}
+\begin{subfigure}{.5\textwidth}
+\includegraphics[width=\linewidth]{2na.pdf}
+\end{subfigure}
+\end{figure}
+\begin{figure}[H]
+\begin{subfigure}{.5\textwidth}
+\includegraphics[width=\linewidth]{2.pdf}
+\end{subfigure}
+\begin{subfigure}{.5\textwidth}
+\includegraphics[width=\linewidth]{3.pdf}
+\end{subfigure}
+\caption*{Nekaj načrtov prehrane pri določenih dodatnih omejitvah poleg zgoraj napisanih.}
+\end{figure}
+
+Dodajanje vitamina C v našo dieto nam torej v jedilnik doda papriko in malo kakava, na račun ostalih jedi. 
+Opazimo tudi, da ima naša originalna dieta v sebi tudi že dovolj kalija in minimalnega priporočenega vnosa natrija, če pa želimo za natrij postaviti zgornjo mejo, jo moramo bolj spremeniti in dodati dve novi vrsti živil.
+
+\newpage
+Zdaj bomo naše zahteve malce spremenili. Zahtevali bomo minimalno 2000 kcal in minimizirali naš vnos maščob. Poleg tega bomo kot prej hoteli tudi min 310g ogljikovih hidratov, 50g proteinov, 1g kalcija in 18 mg železa ter max 2kg obroka.
+
+\begin{figure}[H]
+\begin{subfigure}{.5\textwidth}
+\includegraphics[width=\linewidth]{4.pdf}
+\end{subfigure}
+\begin{subfigure}{.5\textwidth}
+\includegraphics[width=\linewidth]{5.pdf}
+\end{subfigure}
+\caption*{Za razliko od prejšnjih sprememb v tem primeru kar močno spremenimo naš jedilnik v smislu, da jemo čisto različno hrano(Le marmelada in solata se ponovita)}
+\end{figure}
+
+\newpage
+
+Pri prejšnjih primerih sem ponavadi dobil rezultate, ki so vključevali velike količine določene hrane. Da bi tako neraznoliko jedli ni realno, zato bom sedaj omejil vnos posameznega tipa hrane na 200g in ponovno pogledal kakšni so grafi.
+V naslednjih primerih bom želel tudi minimalno 310g ogljikovih hidratov, 50g proteinov, 1g Ca, 18mg Fe, 60 mg vitamina C, 3500 mg K, 500-2400mg Na  in maksimalno 2kg skupnega obroka.
+
+\begin{figure}[H]
+\begin{subfigure}{.5\textwidth}
+\includegraphics[width=\linewidth]{6.pdf}
+\end{subfigure}
+\begin{subfigure}{.5\textwidth}
+\includegraphics[width=\linewidth]{7.pdf}
+\end{subfigure}
+\caption*{Na levi posamezen tip hrane ni omejen, na desni pa je.}
+\end{figure}
+
+\begin{figure}[H]
+\begin{subfigure}{.5\textwidth}
+\includegraphics[width=\linewidth]{8.pdf}
+\end{subfigure}
+\begin{subfigure}{.5\textwidth}
+\includegraphics[width=\linewidth]{9.pdf}
+\end{subfigure}
+\caption*{Na levi posamezen tip hrane ni omejen, na desni pa je.}
+\end{figure}
+
+
+
+\begin{figure}[H]
+\begin{subfigure}{.5\textwidth}
+\includegraphics[width=\linewidth]{extra.pdf}
+\end{subfigure}
+\begin{subfigure}{.5\textwidth}
+\includegraphics[width=\linewidth]{extra3.pdf}
+\end{subfigure}
+\caption*{Primeri diet, če ne maramo/nočemo zelenjave.}
+\end{figure}
+\newpage
+
+Za konec poglejmo še kakšno sliko dobimo, če je naš glavni cilj minimizirati ceno. Omejitve bodo take kot na prejšnji strani(z min 70g maščob in 2000 kcal).
+Tukaj bom optimalni jedilnik bolj grobo ocenil, saj je cena odvisna od več faktorjev npr. trgovine(tukaj sem večinoma gledal cene pri Mercatorju).
+
+\begin{figure}[H]
+\begin{subfigure}{.5\textwidth}
+\includegraphics[width=\linewidth]{cene2.pdf}
+\end{subfigure}
+\begin{subfigure}{.5\textwidth}
+\includegraphics[width=\linewidth]{cene.pdf}
+\end{subfigure}
+\caption*{Zgornja številka na levem grafu pove koliko porabiimo (v evrih) za tisto živilo.}
+\end{figure}
+
+
+\begin{figure}[H]
+\centering
+\begin{subfigure}{.5\textwidth}
+\includegraphics[width=\linewidth]{extra2.pdf}
+\end{subfigure}
+\caption*{Dieta brez zelenjave je cenejša}
+\end{figure}
+\newpage
+Za konec poglejmo še minimizacijo cene, če kupujemo v Združenih državah(kjer sem valuto in enote ustrezno pretvoril) Pri teh cenah je natančnost še manjša, saj je izbire veliko več, jaz pa nisem nič iskal dobre cene, ampak vedno vzel prvo, katero sem našel(Večinoma sem gledal cene v Walmartu).
+\begin{figure}[H]
+\centering
+\begin{subfigure}{.5\textwidth}
+\includegraphics[width=\linewidth]{usa.pdf}
+\end{subfigure}
+\caption*{Cena je v tem primeru prišla višja kot v Sloveniji. }
+\end{figure}
+
+\end{document}
+

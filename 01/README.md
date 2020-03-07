@@ -1,0 +1,1 @@
+Finding the optimal accelerating/braking sequence with calculus of variations.

@@ -1,0 +1,340 @@
+\documentclass{article}
+
+\usepackage[utf8]{inputenc}
+\usepackage{amsmath}
+\usepackage{mathtools}
+\usepackage{graphicx}
+\usepackage{subcaption}
+\usepackage{caption}
+\usepackage{float}
+\usepackage{geometry}
+\usepackage{physics}
+\geometry{margin=1in}
+
+\title{Modeli kemijskih reakcij}
+\author{Andrej Kolar-Požun, 28172042}
+
+
+
+\errorcontextlines 10000
+\begin{document}
+\pagenumbering{gobble}
+\maketitle
+\newpage
+\pagenumbering{arabic}
+\section{Binarna reakcija}
+
+Poglejmo si naslednjo binarno reakcijo
+\begin{align*}
+&2A \xrightleftharpoons[q]{p} A + A^* \\
+&A^* \xrightarrow{r} B + C
+\end{align*}
+
+Če želimo poznati časovni razvoj koncentracij reaktantov in produktov moramo rešiti sistem enačb:
+\begin{align*}
+&\dot{[A]} = -p[A]^2 +q[A][A^*] \\
+&\dot{[A^*]} = p[A]^2 - r[A^*] - q[A][A^*]\\
+&\dot{[B]} = \dot{[C]} = r[A^*]
+\end{align*}
+
+V aproksimaciji stacionarnega stanja postavimo odvod vmesnega stanja na nič in dobimo lažji sistem:
+\begin{align*}
+&[A^*] = p[A]^2 / (r+q[A]) \\
+&\dot{[A]} = -p[A]^2 + qp[A]^3/(r+q[A]) \\
+&\dot{[B]} = \dot{[C]} =  rp[A]^2/(r+q[A])
+\end{align*}
+
+to lahko rešimo analitično in dobimo:
+\begin{equation*}
+\frac{4q}{r}(ln(x) - ln(r-3 q x) - 1/x = -\frac{p}{2}t + A
+\end{equation*}
+
+
+\begin{figure}[H]
+\centering
+\begin{subfigure}{\textwidth}
+\includegraphics[width=\linewidth]{binarno/prva1.pdf}
+\end{subfigure}
+\caption*{Vidi se, da se aproksimacija stacionarnega stanja dobro ujema z eksaktno rešitvijo.}
+\end{figure}
+\begin{figure}[H]
+\centering
+\begin{subfigure}{.49\textwidth}
+\includegraphics[width=\linewidth]{binarno/prva2.pdf}
+\end{subfigure}
+\begin{subfigure}{.49\textwidth}
+\includegraphics[width=\linewidth]{binarno/prva3.pdf}
+\end{subfigure}
+\caption*{Reakcija pri manjšem parametru r/q A(0) poteko počasneje}
+\end{figure}
+
+\begin{figure}[H]
+\centering
+\begin{subfigure}{\textwidth}
+\includegraphics[width=\linewidth]{binarno/blizu.pdf}
+\end{subfigure}
+\caption*{Prej je izgledalo, kot da je A* ves čas na ničli. Tukaj vidimo, da neko spreminjanje vseeno je le vrednost je povsod majhna. Tukaj se tudi lepo vidi kako deluje metoda stacionarnega stanja: vrednost A*(t) hitro pride do ravnovesja in tam ostane.}
+\end{figure}
+
+\begin{figure}[H]
+\centering
+\begin{subfigure}{.49\textwidth}
+\includegraphics[width=\linewidth]{binarno/napake.pdf}
+\end{subfigure}
+\begin{subfigure}{.49\textwidth}
+\includegraphics[width=\linewidth]{binarno/napake2.pdf}
+\end{subfigure}
+\caption*{Napake imajo zelo čudno obnašane. Na levi se takoj vidi, da so v vsakem primeru izjemno majhne na desni pa opazimo, da imamo za majhne čase pri majhnem q/p hudo napako.}
+\end{figure}
+
+\begin{figure}[H]
+\centering
+\begin{subfigure}{\textwidth}
+\includegraphics[width=\linewidth]{binarno/qp.pdf}
+\end{subfigure}
+\caption*{Ker sem prej gledal napake za več q/p, se spodobi še pogledat kako te krivulje sploh izgledajo. Sedaj je tista huda napaka pri majhnem času in q/p nekako smiselna. Takrat že tako hitro pade vrednost na nič, da je verjetno moja diskretizacija že preslaba, da bi se kaj lepo poračunalo(Časovni interval sem diskretiziral na 10000 točk). Tukaj je r/q A(0) = 1.}
+\end{figure}
+
+\begin{figure}[H]
+\centering
+\begin{subfigure}{\textwidth}
+\includegraphics[width=\linewidth]{binarno/cas.pdf}
+\end{subfigure}
+\caption*{Tukaj sem gledal cas do ravnovesja, kjer sem si ravnovesje zamislil kot točko, ko je A'(t)/A(t) < 0.005. Žal pridejo rezultati za q/p ki niso 1000 čudni. Mogoče zato ker je v teh primerih A(t) zelo majhen ko gre odvod proti nič.}
+\end{figure}
+\begin{figure}[H]
+\centering
+\begin{subfigure}{\textwidth}
+\includegraphics[width=\linewidth]{binarno/cas2.pdf}
+\end{subfigure}
+\caption*{Tukaj sem poskusil gledati čas do ravnovesja, kjer je ravnovesje bila točka, kjer velja A'(t) < 0.005. V tem primeru je problem, da se ta pogoj morda prehitro zgodi, saj smo prej videli, da za različne r/q A(0) reakcija poteka veliko hitreje/počasneje. }
+\end{figure}
+\newpage
+\section{Druga naloga}
+
+Zdaj bomo obravnavali reakcijo
+\begin{equation*}
+H_2 + Br_2 \rightleftharpoons 2HBr
+\end{equation*}
+Zgornja reakcija vključuje naslednje vmesne stopnje:
+\begin{align*}
+&Br_2 \xrightleftharpoons[q]{p} 2Br \\
+&Br + H_2 \xrightleftharpoons[s]{r} HBr + H \\
+&H + Br_2 \xrightarrow{t} HBr + Br 
+\end{align*}
+
+Iz tega dobimo sistem enačb:
+\begin{align*}
+&\dot{[H_2]} = s[HBr][H] - r[Br][H_2] \\
+&\dot{[Br_2]} = q[Br]^2 -p[Br_2] - t [H][Br_2] \\
+&\dot{[HBr]} = r[Br][H_2] - s[HBr][H] + t[H][Br_2] \\
+&\dot{[Br]} = p[Br_2] - q[Br]^2 + t[H][Br_2] +s[HBr][H] - r[Br][H_2]\\
+&\dot{[H]} = r[Br][H_2] - s[H][HBr] - t[H][Br_2]
+\end{align*}
+
+Empirični izraz za hitrost reakcije $\dot{[HBr]}$ je:
+\begin{equation*}
+\dot{[HBr]} = \frac{k[H_2][Br_2]^{1/2}}{m+\frac{[HBr]}{[Br_2]}}
+\end{equation*}
+
+V približku stacionarnega stanja bomo postavili odvoda Br in H na nič. Dobimo:
+
+\begin{align*}
+&[H] = r\sqrt{p[Br_2]/q}\ [H_2]/(s[HBr] + t[Br_2]) \\
+&[Br] =  \sqrt{p[Br_2]/q}\\
+\end{align*}
+
+Če to vstavimo v enačbo za $\dot{[HBr]}$ dobimo:
+\begin{align*}
+&k = \sqrt{p/q}\ \frac{2rt}{s} \\
+&m = t/s
+\end{align*}
+
+Konstanti k in m bi določil, da bi meril odvisnost koncentracij reagentov in produkta od časa in fittal krivuljo.
+Koncentracije bi lahko merili z meritvijo spektra absorbcije svetlobe, katero pošljemo skozi raztopino. Spekter bi nam povedal koliko je katerih vezi, kar je povezano s koncentracijo.
+
+Sedaj bom preiskal odvisnosti poteka reakcij od parametrov hitrosti p,q,r,s,t. Gledal bom predvsem pri m=2.5, ker nas ta režim zanima.
+
+\begin{figure}[H]
+\centering
+\begin{subfigure}{\textwidth}
+\includegraphics[width=\linewidth]{druga/1.pdf}
+\end{subfigure}
+\caption*{Povečevanje parametra p pri fiksnih ostalih povzroči, da strmeje in malo hitreje pridemo v ravnovesje. Poleg tega izgleda ,da funkcije ko p povečujemo nekako limitirajo in se zgoščujejo pri p=100. Mimogrede: $Br_2(t)$ ima isto obliko kot $H_2(t)$,kar je res tudi pri naslednjih štirih grafih, torej bi lahko enačbe verjetno še bolj poenostavil, če bi izraza za [H] in [Br] vstavil tudi v prvi dve enačbi.}
+\end{figure}
+
+\begin{figure}[H]
+\centering
+\begin{subfigure}{\textwidth}
+\includegraphics[width=\linewidth]{druga/2.pdf}
+\end{subfigure}
+\caption*{Povečevanje parametra q zdaj ravno obratno povzroča, da počasneje in položneje prihajamo do ravnovesja. Nekako pričakovano saj $p/q$=$(q/p)^{-1}$}
+\end{figure}
+
+\begin{figure}[H]
+\centering
+\begin{subfigure}{\textwidth}
+\includegraphics[width=\linewidth]{druga/3.pdf}
+\end{subfigure}
+\caption*{Kot povečevanje p-ja tudi povečevanje r-ja postrmi funkcija, vendar je tukaj vpliv r-ja na strmino veliko močnejši.}
+\end{figure}
+
+\begin{figure}[H]
+\centering
+\begin{subfigure}{\textwidth}
+\includegraphics[width=\linewidth]{druga/4.pdf}
+\end{subfigure}
+\caption*{Povečevanje parametra s pa reakcijo upočasni. Ta in naslednji graf sem plottal samo, da vidim še odvisnost od teh dveh parametrov, tukaj m ni več enak 2.5}
+\end{figure}
+
+\begin{figure}[H]
+\centering
+\begin{subfigure}{\textwidth}
+\includegraphics[width=\linewidth]{druga/5.pdf}
+\end{subfigure}
+\end{figure}
+
+Iz zgornjih slik mogoče dobimo neko idejo, kako se oblika funkcij spreminja s temi parametri, nimamo pa cele zgodbe, saj sem vedno spreminjal le enega, ostali pa so bili konstantni. Pri poljubni kombinaciji parametrov bi lahko dobili nekaj drugega(Vemo pa seveda da mora biti odvisnost eksponentna).
+Kot sem že zgoraj povedal se vidi, da je $H_2(t) = Br_2(t)$, torej bi z nekaj premetavanja enačb lahko zmanjšal število konstant, a se tega ne bom lotil še posebej, ker bi rad pogledal še eksaktno rešitev:
+\newpage
+\begin{figure}[H]
+\centering
+\begin{subfigure}{.32\textwidth}
+\includegraphics[width=\linewidth]{druga/1e.pdf}
+\end{subfigure}
+\begin{subfigure}{.32\textwidth}
+\includegraphics[width=\linewidth]{druga/2e.pdf}
+\end{subfigure}
+\begin{subfigure}{.32\textwidth}
+\includegraphics[width=\linewidth]{druga/3e.pdf}
+\end{subfigure}
+\end{figure}
+\begin{figure}[H]
+\centering
+\begin{subfigure}{.49\textwidth}
+\includegraphics[width=\linewidth]{druga/4e.pdf}
+\end{subfigure}
+\begin{subfigure}{.49\textwidth}
+\includegraphics[width=\linewidth]{druga/5e.pdf}
+\end{subfigure}
+\caption*{Ni nam treba scrollat do prejšnjih grafov, da vidimo, da so ti zelo različni. Tega nisem pričakoval. V tem primeru tudi seveda $H_2(t) \neq Br_2(t)$}
+\end{figure}
+
+\begin{figure}[H]
+\centering
+\begin{subfigure}{\textwidth}
+\includegraphics[width=\linewidth]{druga/km.pdf}
+\end{subfigure}
+\caption*{tukaj sem za (p,q,r,s,t) = (1,1,1,1,2.5) primerjal parametre k in m, ki jih data stac. aproksimacija in eksaktna rešitev. Iz znanih koncentracij sem to numerično določil s pomočjo funkcije fsolve. Vidimo, da stac. aproksimacija v limiti daljših časov(kjer najbolje deluje) da pravo rešitev za oba parametra, tako da sem verjetno pri eksaktni integraciji naredil nekje neko napako. Mimogrede: za parameter m data obe metodi pravo vrednost.}
+\end{figure}
+
+Poglejmo še kako izgleda potek reakcij, ki jih zahteva naloga. Delal bom z aproksimacijo stacionarnega stanja, za katero smo zdaj ugotovili, da da pravilen rezultat:
+
+\begin{figure}[H]
+\centering
+\begin{subfigure}{\textwidth}
+\includegraphics[width=\linewidth]{druga/prva.pdf}
+\end{subfigure}
+\caption*{To smo videli že prej, tukaj samo dam za lažjo primerjavo.}
+\end{figure}
+\begin{figure}[H]
+\centering
+\begin{subfigure}{.49\textwidth}
+\includegraphics[width=\linewidth]{druga/druga1.pdf}
+\end{subfigure}
+\begin{subfigure}{.49\textwidth}
+\includegraphics[width=\linewidth]{druga/druga2.pdf}
+\end{subfigure}
+\caption*{V tem primeru se koncentracija vodika komajda premakne navzdol, brom pa hitro pade na 0, nastane nekaj HBr.}
+\end{figure}
+
+\begin{figure}[H]
+\centering
+\begin{subfigure}{.49\textwidth}
+\includegraphics[width=\linewidth]{druga/tretja1.pdf}
+\end{subfigure}
+\begin{subfigure}{.49\textwidth}
+\includegraphics[width=\linewidth]{druga/tretja2.pdf}
+\end{subfigure}
+\caption*{Podobno kot pri prejšnjem grafu, le da se vse skupaj dogaja na manjši skali.}
+\end{figure}
+
+Kaj pa se zgodi, če imamo v začetku že nekaj koncentracije $HBr$ v raztopini?
+\begin{figure}[H]
+\begin{subfigure}{.49\textwidth}
+\includegraphics[width=\linewidth]{druga/hbr.pdf}
+\end{subfigure}
+\begin{subfigure}{.49\textwidth}
+\includegraphics[width=\linewidth]{druga/hbr2.pdf}
+\end{subfigure}
+\caption*{Z dodajanjem HBr(t) veliko počasneje pridemo do ravnovesja.}
+\end{figure}
+
+\section{Kemijska ura}
+Poglejmo si jodovo uro, ki temelji na naslednjih reakcijah:
+\begin{align*}
+&S_2O_8^{2-} +2I^{-} \rightarrow I_2 + 2SO_4^{2-} \\
+&2S_2O_3^{2-} + I_2 \rightarrow 2I^{-} + S_4O_6^{2-}
+\end{align*}
+Ti dve reakciji potekata vsaka preko dveh stopenj:
+\begin{align*}
+&S_2O_8^{2-} + I^- \xrightarrow{a} IS_2O_8^{3-} \\
+&IS_2O_8^{3-} + I^- \xrightarrow{b} I_2 + 2SO_4^{2-} \\
+&S_2O_3^{2-} + I_2 \xrightarrow{c} IS_2O_3^- + I^- \\
+&IS_2O_3^{-} + S_2O_3^{2-} \xrightarrow{d} I^- + S_4O_6^{2-}
+\end{align*}
+Iz tega sledi sistem diferencialnih enačb:
+\begin{align*}
+&\dot{[S_2O_8^{2-}]} = -a[S_2O_8^{2-}][I^-] \\
+&\dot{[I^-]} = -a[S_2O_8^{2-}][I^-] - b[I^-][IS_2O_8^{3-}] +c[S_2O_3^{2-}][I_2] + d[IS_2O_3^-][S_2O_3^{2-}] \\
+&\dot{[IS_2O_8^{3-}]} = a[S_2O_8^{2-}][I^-] - b[I^-][IS_2O_8^{3-}] \\
+&\dot{[I_2]} = b[IS_2O_8^{3-}][I^-] - [I_2][S_2O_3^{2-}] \\
+&\dot{[SO_4^{2-}]} = 2b[IS_2O_8^{3-}][I^-] \\
+&\dot{[S_2O_3^{2-}]} = -c [S_2O_3^{2-}][I_2] -d[S_2O_3^{2-}][IS_2O_3^-] \\
+&\dot{[IS_2O_3^-]} = c[S_2O_3^{2-}][I_2] - d [IS_2O_3^-][S_2O_3^{2-}] \\
+&\dot{[S_4O_6^{2-}]} = -d [IS_2O_3^-][S_2O_3^{2-}] \\
+\end{align*}
+V aproksimaciji stacionarnega stanja postavim levo stran 3. in 7. enačbe na nič. Dobim:
+\begin{align*}
+&a[S_2O_8^{2-}] = b[IS_2O_8^{3-}] \\
+&c[I_2] = d[IS_2O_3^-]
+\end{align*}
+Dobimo naslednje kinetične zveze:
+\begin{align*}
+&\dot{[I_2]} = a [S_2O_8^{2-}][I^-] - c[I_2][S_2O_3^{2-}] \\
+&\dot{[I^-]} = -2a [S_2O_8^{2-}][I^-] +2c [S_2O_3^{2-}][I_2] \\
+&\dot{[S_2O_3^{2-}]} = -2c [S_2O_3^{2-}][I_2] \\
+&\dot{[S_2O_8^{2-}]} = -a[S_2O_8^{2-}][I^-] \\
+\end{align*}
+Vemo, da je druga glavna reakcija hitrejša od prve, torej vzamemo $a \leq c$
+
+\begin{figure}[H]
+\begin{subfigure}{.49\textwidth}
+\includegraphics[width=\linewidth]{druga/lamb1.pdf}
+\end{subfigure}
+\begin{subfigure}{.49\textwidth}
+\includegraphics[width=\linewidth]{druga/lamb2.pdf}
+\end{subfigure}
+\caption*{Večja začetna koncentracija tiosulfata nam podaljša čas do reakcije. Zniževanje razmerja pa pri tej uri zmanjšuje ostrino začetka reakcij}
+\end{figure}
+
+\begin{figure}[H]
+\begin{subfigure}{.49\textwidth}
+\includegraphics[width=\linewidth]{druga/lamb3.pdf}
+\end{subfigure}
+\begin{subfigure}{.49\textwidth}
+\includegraphics[width=\linewidth]{druga/lamb4.pdf}
+\end{subfigure}
+\caption*{Pri razmerju hitrosti reakcij 100 tukaj ura že slabo deluje v primerjavi s prejšnjimi slikami.}
+\end{figure}
+
+\begin{figure}[H]
+\centering
+\begin{subfigure}{\textwidth}
+\includegraphics[width=\linewidth]{druga/hitrost.pdf}
+\end{subfigure}
+\caption*{Odvisnost časa do reakcije od začetne koncentracije tiosulfata.}
+\end{figure}
+
+
+\end{document}

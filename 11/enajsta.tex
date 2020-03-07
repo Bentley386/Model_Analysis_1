@@ -1,0 +1,226 @@
+\documentclass{article}
+
+\usepackage[utf8]{inputenc}
+\usepackage{amsmath}
+\usepackage{mathtools}
+\usepackage{graphicx}
+\usepackage{subcaption}
+\usepackage{caption}
+\usepackage{float}
+\usepackage{geometry}
+\usepackage{physics}
+\usepackage{mathrsfs}
+\geometry{margin=1in}
+
+\title{Stohastični populacijski modeli}
+\author{Andrej Kolar-Požun, 28172042}
+
+
+
+\errorcontextlines 10000
+\begin{document}
+\pagenumbering{gobble}
+\maketitle
+\newpage
+\pagenumbering{arabic}
+\section{Preprosta smrt}
+
+Vrnimo se k našemu populacijskem modelu, kjer nam populacija izumira.
+\begin{equation*}
+\frac{dN}{dt} = -\beta N
+\end{equation*}
+Tokrat rečemo, da je število umrlih v času $\Delta t$ porazdeljeno Poissonsko:
+\begin{equation*}
+\Delta N = - \mathscr{P}(\beta N \Delta t)
+\end{equation*}
+
+\begin{figure}[H]
+\centering
+\begin{subfigure}{.49\textwidth}
+\includegraphics[width=\linewidth]{prva/1.pdf}
+\end{subfigure}
+\begin{subfigure}{.49\textwidth}
+\includegraphics[width=\linewidth]{prva/2.pdf}
+\end{subfigure}
+\caption*{Na hitro sem si narisal izumiranje populacije, da vem kaj lahko pričakujem. Vidim, da je čas izumertja porazdeljen po kar široki časovni skali, in da je ta izgleda odvisen od časovnega koraka. Pri časovnem koraku 1 se je zgodilo, da je populacija umrla že v eni potezi, medtem ko je bilo za to pri koraku 0.1 bilo potrebno vsaj 25 potez, torej je populacija preživela občutno več časa.}
+\end{figure}
+\begin{figure}[H]
+\centering
+\begin{subfigure}{.49\textwidth}
+\includegraphics[width=\linewidth]{prva/3.pdf}
+\end{subfigure}
+\begin{subfigure}{.49\textwidth}
+\includegraphics[width=\linewidth]{prva/4.pdf}
+\end{subfigure}
+\caption*{Podobna slika tudi za 10 kratno populacijo. Na desni se lepše vidi, da je umiranje eksponentno.}
+\end{figure}
+
+Preverimo sedaj, po kakšni porazdelitvi so časi izumrtja porazdeljeni.
+
+\begin{figure}[H]
+\centering
+\begin{subfigure}{.7\textwidth}
+\includegraphics[width=\linewidth]{prva/porazdelitev.pdf}
+\end{subfigure}
+\caption*{Porazdelitvi za $\Delta t=1$ imata obe vrh pri 1 enoti časa. Za $\Delta t = 0.1$ dobimo bolj razmazano porazdelitev okoli vrha, ki je pri večji populaciji zamaknjen proti večjim časom.}
+\end{figure}
+
+\begin{figure}[H]
+\centering
+\begin{subfigure}{.7\textwidth}
+\includegraphics[width=\linewidth]{prva/delta.pdf}
+\end{subfigure}
+\caption*{Vidimo, da odvisnost na tej skali nima nobene asimptote, zato bom od zdaj naprej za korak v času izbral kar 0.01, ker bi bilo smiselno, da so manjši koraki v času pravilnejši}
+\end{figure}
+
+Naš model lahko izpopolnimo, če umiranju dodamo še rojstva:
+\begin{equation*}
+\Delta N = - \mathscr{P}(\beta_s N \Delta t) + \mathscr{P}(\beta_r N \Delta t)
+\end{equation*}
+
+\begin{figure}[H]
+\centering
+\begin{subfigure}{.7\textwidth}
+\includegraphics[width=\linewidth]{prva/rojstva.pdf}
+\end{subfigure}
+\caption*{Čas smrti populacije izgleda manjši, vidimo pa seveda tudi občasno rast populacije zaradi rojstev.}
+\end{figure}
+
+\begin{figure}[H]
+\centering
+\begin{subfigure}{.7\textwidth}
+\includegraphics[width=\linewidth]{prva/rojstvaporazdelitev.pdf}
+\end{subfigure}
+\caption*{}
+\end{figure}
+
+\begin{figure}[H]
+\centering
+\begin{subfigure}{.7\textwidth}
+\includegraphics[width=\linewidth]{prva/deltarojstva.pdf}
+\end{subfigure}
+\caption*{Odvisnost za male N ima v tem primeru manjši naklon, a vseeno nimamo kake jasne asimptotike.}
+\end{figure}
+
+\begin{figure}[H]
+\centering
+\begin{subfigure}{.7\textwidth}
+\includegraphics[width=\linewidth]{prva/rojstvarojstva.pdf}
+\end{subfigure}
+\caption*{Še odvisnost od $\beta_r$.}
+\end{figure}
+
+Zanimivo bi bilo videti še, kako se porazdelitev umrlih na enoto časa spreminja s časom, saj vemo, da imamo vsakič Poissonovo porazdelitev z drugačnim povprečjem. Za primer umiranja z $\beta=1$ sem tako naredil animacijo(Poisson.mp4), ki prikazuje umiranje začetne populacije N=250 pri $\Delta t = 0.1$, kjer zraven prikažem še Poissonovo porazdelitev ob tistem času.
+
+\section{Prehodna matrika}
+
+Časovni razvoj populacije želimo zdaj zapisati na način 
+\begin{equation*}
+\vec{x}(t+\Delta t) = M \vec{x}(t)
+\end{equation*}
+Kjer komponenta vektorja $\vec{x}$ $x_I$ predstavlja verjetnost, da smo v stanju z populacijo $N=i$. Matriki M rečemo prehodna matrika in jo izračunamo na sledeč način:
+
+Rečemo, da je verjetnost za r rojstev in s smrti kar produkt Poissonovih porazdelitev, saj so rojstva in smrti neodvisni dogodki, razvijemo za majhne korake v času, v katerih predpostavimo, da lahko umre/se rodi maksimalno 1 človek. Tako dobimo matriko:
+
+\begin{equation*}
+\begin{bmatrix} 
+1-R_0 \Delta t - S_0 \Delta t & S_1 \Delta t & 0 & ... & ...\\
+R_0 \Delta t & 1-R_1 \Delta t - S_1 \Delta t & S_2 \Delta t  & 0 & ...\\
+0 & R_1 \Delta t & 1-R_2 \Delta t - S_2 \Delta t &  S_3 \Delta t & ...\\
+... & ... & ... & ... & ...
+\end{bmatrix}
+\end{equation*}
+
+Kjer je $R_n = \beta_r * n$ in podobno za $S_n$
+
+\begin{align*}
+&\mu(t) = \mu(0) e^{(\beta_r - \beta_s)t} \\
+\end{align*}
+
+\begin{figure}[H]
+\centering
+\begin{subfigure}{.7\textwidth}
+\includegraphics[width=\linewidth]{druga/povprecja.pdf}
+\end{subfigure}
+\caption*{Še odvisnost od $\beta_r$.}
+\end{figure}
+
+\begin{figure}[H]
+\centering
+\begin{subfigure}{.7\textwidth}
+\includegraphics[width=\linewidth]{druga/povprecja2.pdf}
+\end{subfigure}
+\end{figure}
+Časovno spreminjanje povprečja in variance se za primer N=250 tudi lepo vidi na priloženi animaciji prehodna.mp4(samo smrti) in prehodna2.mp4(z rojstvi)
+
+\section{Zajci in Lisice}
+
+Vrnimo se k našem modelu zajcev in lisic in ga tokrat obravnavajmo stohastično. Spomnimo se:
+\begin{align*}
+&\dot{Z} = \rho_z Z - \sigma_z Z - \gamma Z L \\
+&\dot{L} = \rho_l L - \sigma_l L + \delta Z L
+\end{align*}
+
+Upoštevajmo še navodila torej zahtevajmo $\rho_z / \sigma_z = 5/4$, $\rho_l / \sigma_l = 4/5$ ter se odločimo, da bomo tudi koeficient sklopitvenega člena definirali z ostalimi:
+
+\begin{align*}
+&\dot{Z} = 5 \alpha Z - 4 \alpha Z - \alpha / L_0 Z L \\
+&\dot{L} = 4 \beta L - 5 \beta L + \beta / Z_0 Z L \\
+&Z_{n+1} = Z_n + \mathscr{P}(5 \alpha Z_n \Delta t) - \mathscr{P}(4 \alpha Z_n \Delta t) - \mathscr{P}\Big( \frac{\alpha}{L_0} Z_n L_n \Delta t\Big) \\
+&L_{n+1} = L_n + \mathscr{P}(4 \beta L_n \Delta t) - \mathscr{P}(5 \beta L_n \Delta t) + \mathscr{P}\Big( \frac{\beta}{Z_0} Z_n L_n \Delta t\Big) \\
+\end{align*}
+
+Pri več ponovitvah simulacije za iste parametre dobimo veliko različnih slik:
+
+\begin{figure}[H]
+\centering
+\begin{subfigure}{.49\textwidth}
+\includegraphics[width=\linewidth]{tretja/11.pdf}
+\end{subfigure}
+\begin{subfigure}{.49\textwidth}
+\includegraphics[width=\linewidth]{tretja/12.pdf}
+\end{subfigure}
+\caption*{}
+\end{figure}
+
+\begin{figure}[H]
+\centering
+\begin{subfigure}{.49\textwidth}
+\includegraphics[width=\linewidth]{tretja/21.pdf}
+\end{subfigure}
+\begin{subfigure}{.49\textwidth}
+\includegraphics[width=\linewidth]{tretja/22.pdf}
+\end{subfigure}
+\caption*{Tukaj nekaj časa fluktuiramo okoli stabilne točke preden nas odnese do smrti.}
+\end{figure}
+
+\begin{figure}[H]
+\centering
+\begin{subfigure}{.49\textwidth}
+\includegraphics[width=\linewidth]{tretja/31.pdf}
+\end{subfigure}
+\begin{subfigure}{.49\textwidth}
+\includegraphics[width=\linewidth]{tretja/32.pdf}
+\end{subfigure}
+\caption*{Tukaj nas skorajda takoj odnese ven iz stabilne točke in proti smrti.}
+\end{figure}
+
+\begin{figure}[H]
+\centering
+\begin{subfigure}{.49\textwidth}
+\includegraphics[width=\linewidth]{tretja/41.pdf}
+\end{subfigure}
+\begin{subfigure}{.49\textwidth}
+\includegraphics[width=\linewidth]{tretja/42.pdf}
+\end{subfigure}
+\caption*{}
+\end{figure}
+
+
+
+
+
+
+
+
+\end{document}

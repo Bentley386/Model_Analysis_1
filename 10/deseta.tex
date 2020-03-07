@@ -1,0 +1,119 @@
+\documentclass{article}
+
+\usepackage[utf8]{inputenc}
+\usepackage{amsmath}
+\usepackage{mathtools}
+\usepackage{graphicx}
+\usepackage{subcaption}
+\usepackage{caption}
+\usepackage{float}
+\usepackage{geometry}
+\usepackage{physics}
+\geometry{margin=1in}
+
+\title{Metropolisov algoritem}
+\author{Andrej Kolar-Požun, 28172042}
+
+
+
+\errorcontextlines 10000
+\begin{document}
+\pagenumbering{gobble}
+\maketitle
+\newpage
+\pagenumbering{arabic}
+\section{Molekularna verižnica}
+
+Z Metropolisovim algoritmom bom izračunal ravnovesno obliko in energijo molekularne verižice, podane z naslednjim  Hamiltonjanom:
+\begin{equation*}
+H = \sum_{i=1}^{17}\alpha h_i + 0.5 \sum_{i=1}^{16} (h_{i+1} - h_{i})^2
+\end{equation*}
+
+Poteza bo sprememba višine enega izmed členov za 1. Pri tem pridobimo spremembo energije.
+Naša predlagano verjetnost bo kar konstantna, verjetnost sprejema pa bo boltzmannova, torej bomo novo stanje sprejeli z verjetnostjo
+$e^{-\Delta E/T}$
+
+Sprememba energije pri potezi  $h_i \rightarrow h_i + \delta_i$ je
+\begin{equation*}
+\delta_i^2 - \delta_i (h_{i+1} - 2h_i + h_{i-1} - \alpha)
+\end{equation*}
+
+\begin{figure}[H]
+\centering
+\begin{subfigure}{.49\textwidth}
+\includegraphics[width=\linewidth]{prva/energijaN.pdf}
+\end{subfigure}
+\begin{subfigure}{.49\textwidth}
+\includegraphics[width=\linewidth]{prva/energijaN2.pdf}
+\end{subfigure}
+\caption*{Najprej sem hotel preveriti, koliko potez sploh potrebujemo, da pridemo do ravnovesja, začel sem z N=1000000 in videl, da pridemo do ravnovesja pri več temperaturah že veliko prej, pri okoli N=1500}
+\end{figure}
+
+Na tej točki lahko izračunam še odvisnost ravnovesne energije od temperature. Zgoraj vidimo, da ta še posebej pri višjih temperaturah dosti fluktuira, tako da bom po prehodu v ravnovesje vzorčil energijo na 1000 korakov in to povprečil.
+
+\begin{figure}[H]
+\centering
+\begin{subfigure}{.7\textwidth}
+\includegraphics[width=\linewidth]{prva/EodT.pdf}
+\end{subfigure}
+\caption*{Energija s temperaturo narašča, pri večji temperaturi pa začne tudi malo bolj fluktuirat. Povečanje parametra alfa nam celotno energijo zmanjša. Tukaj tudi nisem še vzel optimalne konfiguracije verige pri višji temperaturi kot začetni približek za nižjo, ampak sem kot začetni približek vzel nekako parabolično razporejene molekule.}
+\end{figure}
+
+Na priloženi animaciji veriga.mp4 lahko grobo vidimo, kako se pri višji temperaturi "poskočna" veriga z nižanjem temperature pod približno 10 počasi stabilizira. Na animaciji verige.mp4 podrobneje vidimo nizkotemperaturni režim, kjer se verižica stabilizira. Opazimo, da se za zelo majhne alfa drži stropa in tudi pri nižjih temperaturah dosti fluktuira.
+
+
+\section{Isingov model}
+
+Obravnavajmo zdaj feromagnet v 2D Isingovem modelu. Hamiltonjan je
+\begin{equation*}
+H = - J \sum_{<ij>} s_i s_j - h \sum_i s_i
+\end{equation*}
+
+Kjer bom J postavil na ena, zunanje polje h pa zaenkrat na 0. $s_i$ je vrednost spina na i-tem mestu, ki je lahko $\pm 1$. Robni pogoji so periodični.
+
+Recimo, da je poteza sprememba predznaka spina na mestu (k,l), sprememba energije pri potezi je:
+\begin{equation*}
+\Delta E = 4Js_{kl} (s_{k-1,l} + s_{k+1,l} + s_{k,l-1} + s_{k,l+1}) + 2h s_{kl}
+\end{equation*}
+
+\begin{figure}[H]
+\centering
+\begin{subfigure}{.7\textwidth}
+\includegraphics[width=\linewidth]{druga/naivno.pdf}
+\end{subfigure}
+\caption*{Najprej preverim število korakov potrebnih za konvergenco energije. Za N=300 je to kakih 5 miljonov, za N=100 pa recimo 500000. Rdeča črta prikazuje čas(desna y os) izvajanja algoritma, ki je za vse približno enak.}
+\end{figure}
+
+Zdaj bom prikazal še odvisnost nekaterih količin od temperature:
+
+\begin{figure}[H]
+\centering
+\begin{subfigure}{.49\textwidth}
+\includegraphics[width=\linewidth]{druga/energija.pdf}
+\end{subfigure}
+\begin{subfigure}{.49\textwidth}
+\includegraphics[width=\linewidth]{druga/magnetizacija.pdf}
+\end{subfigure}
+\caption*{Energija se s temperaturo veča, pri večanje jakosti magnetnega polja se veča počasneje, za h=10 izgleda kar konstantna. Magnetizacijo polje pri nizkih temperaturah drži na 1, pade šele pri višjih temperaturah. Spontana magnetizacija z nižanjem temperature narašča, na 1 bi mogla prit okoli rdeče črtkane črte - teoretična napoved temperature faznega prehoda. V tem primeru se to ni ravno idealno zgodilo, verjetno ker sem preslabo povprečeval.}
+\end{figure}
+
+\begin{figure}[H]
+\centering
+\begin{subfigure}{.49\textwidth}
+\includegraphics[width=\linewidth]{druga/susc.pdf}
+\end{subfigure}
+\begin{subfigure}{.49\textwidth}
+\includegraphics[width=\linewidth]{druga/kapac.pdf}
+\end{subfigure}
+\caption*{Na levi susceptibilnost, ki bi morala na točki faznega prehoda divergirati/močno narasti. Na desni pa  toplotna kapaciteta. Zagotovo ne bi smela biti negativna, nekaj je šlo narobe.}
+\end{figure}
+
+Na priloženi animaciji ising.mp4 lahko vidimo, kako poteka tranzicija iz neurejene v urejeno fazo. Pri velikem magnetnem polju so spini že pri višji temperaturi urejeni. 
+
+\section{Trgovski popotnik}
+
+Na hitro bom pogledal še primer trgovskega popotnika. Naključno bom zgeneriral 10 točk in jih med sabo povezal. Na vsaki potezi bom naključno permutiral dve točki in gledal pridobljeno razliko celotne dolžine poti. Ne zelo premišljena metoda pa bo mogoče vseeno delovala.
+Naredil sem le eno animacijo(merchant.mp4), kjer sem naključno generiral 10 točk in poizkusil najti optimalno pot. Skupna razdalja kar močno fluktuira in vmes narašča tudi pri zelo nizkih "temperaturah", a se na koncu vseeno pri neki majhni razdalji ustali. 
+
+
+\end{document}
